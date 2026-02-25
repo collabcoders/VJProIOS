@@ -14,6 +14,18 @@
 {
     // Override point for customization after application launch.
     self.window.tintColor = [UIColor whiteColor];
+    
+    // Make status bar content white on all view controllers
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:NO];
+    
+    // Set window background to black to eliminate white space
+    self.window.backgroundColor = [UIColor blackColor];
+    
+    // Adjust window frame to remove any top spacing
+    CGRect windowFrame = self.window.frame;
+    windowFrame.origin.y = 0;
+    self.window.frame = windowFrame;
+    
     return YES;
 }
 							

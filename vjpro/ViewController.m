@@ -48,6 +48,14 @@
 {
     [super viewDidLoad];
     
+    // Remove top gap - disable extended layout
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
+    
     // Do any additional setup after loading the view, typically from a nib.
     _viewAbout.hidden = YES;
     [_txtEmail setReturnKeyType:UIReturnKeyGo];
@@ -71,10 +79,10 @@
     //text box left padding
     _txtEmail.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 12, 20)];
     _txtEmail.leftViewMode = UITextFieldViewModeAlways;
-    _txtEmail.background = [[UIImage imageNamed:@"image"] stretchableImageWithLeftCapWidth:7 topCapHeight:17];
+    _txtEmail.backgroundColor = [UIColor whiteColor];
     _txtPassword.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 12, 20)];
     _txtPassword.leftViewMode = UITextFieldViewModeAlways;
-    _txtPassword.background = [[UIImage imageNamed:@"image"] stretchableImageWithLeftCapWidth:7 topCapHeight:17];
+    _txtPassword.backgroundColor = [UIColor whiteColor];
     
     myFrame = _viewLogin.frame;
     int bgmargin = 0;
@@ -322,6 +330,12 @@
     if([segue.identifier isEqualToString:@"segue1"]){
         NSLog(@"In Perform segue");
         SKSlideViewController *controller=(SKSlideViewController *)[segue destinationViewController];
+        
+        // Force full screen presentation (removes the gap and rounded corners)
+        if (@available(iOS 13.0, *)) {
+            controller.modalPresentationStyle = UIModalPresentationFullScreen;
+        }
+        
         [controller setSegueIDForMainController:SK_DEFAULT_SEGUE_IDENTIFIER_MAIN leftController:SK_DEFAULT_SEGUE_IDENTIFIER_LEFT rightController:SK_DEFAULT_SEGUE_IDENTIFIER_RIGHT];
         [controller setLoadViewControllersOnDemand:YES];
         [controller setSlideControllerStyleMask:SKSlideControllerStyleRevealLeft|SKSlideControllerStyleRevealRight];
@@ -370,9 +384,9 @@
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView {
-    if ([[webView stringByEvaluatingJavaScriptFromString:@"document.readyState"] isEqualToString:@"complete"]) {
+    //if ([[webView stringByEvaluatingJavaScriptFromString:@"document.readyState"] isEqualToString:@"complete"]) {
         [_ovcontroller hideOverlay];
         [_spinner stopAnimating];
-    }
+    //}
 }
 @end

@@ -79,6 +79,14 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
+    // Extend view under status bar
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {
+        self.edgesForExtendedLayout = UIRectEdgeTop;
+    }
+    
+    // Set main view background to black to match design
+    self.view.backgroundColor = [UIColor blackColor];
+    
     _isInitial = TRUE;
     _seekbar.hidden = YES;
     _viewVideoHeader.hidden = YES;
@@ -139,6 +147,10 @@
     _isInitial = TRUE;
     _lblBuffering.hidden = NO;
     
+    // Reset slider to beginning for new video
+    _seekbar.value = 0;
+    _seekbar.maximumValue = 1;  // Temporary value until video loads
+    
     secondsToRemoveSpinner =  (int)(self.seconds - 1);
     [_lblSecondsTotalLabel setText:[NSString stringWithFormat:@"%ld Second Preview", (long)self.seconds]];
     _seekbar.hidden = NO;
@@ -185,7 +197,7 @@
     //hd icon
     NSString *imgHd = @"blank";
     int hd = (int)self.video.quality;
-    if (hd == 1 || hd == 2) {
+    if (hd == 1 || hd == 2 || hd == 3) {
         if (hd == 2) {
             imgHd = @"icon_1080p_big";
             _lblCreditsNonHd.hidden = YES;
@@ -194,6 +206,12 @@
         }
         if (hd == 1) {
             imgHd = @"icon_hd_big";
+            _lblCreditsNonHd.hidden = YES;
+            _lblCreditsHd.hidden = NO;
+            [_lblCreditsHd setText:lblCredit];
+        }
+        if (hd == 3) {
+            imgHd = @"icon_qhd_big";
             _lblCreditsNonHd.hidden = YES;
             _lblCreditsHd.hidden = NO;
             [_lblCreditsHd setText:lblCredit];
@@ -222,15 +240,51 @@
     //video
     [_vidTimer invalidate];
     _vidTimer = nil;
-    NSString * strVideoUrl = [NSString stringWithFormat:@"https://www.vj-pro.net/Uploads/Previews/%@", self.video.vidurl];
+    
+    // URL encode the filename parameter
+    NSString *encodedFilename = [self.video.vidurl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    
+    // Build URL with possible authentication if needed
+    NSString *userId = [NSString stringWithFormat:@"%ld", (long)[UserModel getUserID]];
+    NSString * strVideoUrl = [NSString stringWithFormat:@"https://members.vj-pro.net/Handlers/PreviewCloud.ashx?file=%@&userId=%@", encodedFilename, userId];
+    
+    NSLog(@"========================================");
+    NSLog(@"Preview Video URL: %@", strVideoUrl);
+    NSLog(@"Original filename: %@", self.video.vidurl);
+    NSLog(@"User ID: %@", userId);
+    NSLog(@"========================================");
+    
+    // Test URL accessibility
+    [self testURLAccessibility:strVideoUrl];
+    
     _vidTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(updatePlaybackProgressFromTimer:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:_vidTimer forMode:NSRunLoopCommonModes];
     
     //[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updatePlaybackProgressFromTimer:) userInfo:nil repeats:YES];
     NSURL *movieURL = [NSURL URLWithString:strVideoUrl];
+    
+    if (!movieURL) {
+        NSLog(@"ERROR: Invalid URL - could not create NSURL from string: %@", strVideoUrl);
+        [UtilityModel showAlert:@"Video Error" msg:@"Invalid video URL. Please try again."];
+        [self hideLoading];
+        return;
+    }
+    
+    NSLog(@"Creating movie player with URL: %@", movieURL);
+    
     moviePlayerController = [[MPMoviePlayerController alloc] initWithContentURL:movieURL];
+    
+    if (!moviePlayerController) {
+        NSLog(@"ERROR: Failed to create MPMoviePlayerController");
+        [UtilityModel showAlert:@"Video Error" msg:@"Failed to initialize video player."];
+        [self hideLoading];
+        return;
+    }
+    
     [moviePlayerController prepareToPlay];
     moviePlayerController.movieSourceType = MPMovieSourceTypeStreaming;
+    
+    NSLog(@"Movie player created successfully. Source type: Streaming");
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(moviePlaybackComplete:)
@@ -250,10 +304,22 @@
                                                     _btnPreview.frame.size.width,
                                                     _btnPreview.frame.size.height)];
     moviePlayerController.controlStyle = MPMovieControlStyleNone;
+    
+    // Disable VisionKit interactions that may trigger background removal warnings
+    if (@available(iOS 16.0, *)) {
+        for (UIGestureRecognizer *recognizer in moviePlayerController.view.gestureRecognizers) {
+            if ([NSStringFromClass([recognizer class]) containsString:@"ImageAnalysis"]) {
+                recognizer.enabled = NO;
+            }
+        }
+    }
+    
     [self.view addSubview:moviePlayerController.view];
     moviePlayerController.initialPlaybackTime = 1;
-    //[moviePlayerController prepareToPlay];
-    [moviePlayerController pause];
+    
+    // Don't call pause immediately - let it load first
+    // The player will be in a paused state initially anyway
+    NSLog(@"Movie player view added to hierarchy");
     
     //seek bar
     _shadowSlider = [[UIView alloc] init];
@@ -269,11 +335,37 @@
 }
 
 
-#pragma mark - SKSlideViewDelegate -
-
 -(void)setSKSlideViewControllerReference:(SKSlideViewController *)aSlideViewController{
     self.slideController=aSlideViewController;
 }
+
+- (void)testURLAccessibility:(NSString *)urlString {
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    [request setHTTPMethod:@"HEAD"];
+    [request setTimeoutInterval:10.0];
+    
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            NSLog(@"❌ URL Test Failed: %@", [error localizedDescription]);
+        } else if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            NSLog(@"✅ URL Test Response: Status Code %ld", (long)httpResponse.statusCode);
+            NSLog(@"   Content-Type: %@", httpResponse.allHeaderFields[@"Content-Type"]);
+            NSLog(@"   Content-Length: %@", httpResponse.allHeaderFields[@"Content-Length"]);
+            
+            if (httpResponse.statusCode != 200) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [UtilityModel showAlert:@"Video URL Error" msg:[NSString stringWithFormat:@"Server returned status code %ld", (long)httpResponse.statusCode]];
+                });
+            }
+        }
+    }];
+    [task resume];
+}
+
+#pragma mark - SKSlideViewDelegate -
 
 #pragma mark - MoviePlayer -
 
@@ -287,7 +379,7 @@
     moviePlayerController.initialPlaybackTime = -1;
     [moviePlayerController.view removeFromSuperview];
     MPMovieFinishReason finishReason = [notification.userInfo[MPMoviePlayerPlaybackDidFinishReasonUserInfoKey] integerValue];
-    //NSError *error = notification.userInfo[XCDMoviePlayerPlaybackDidFinishErrorUserInfoKey];
+    NSError *error = notification.userInfo[@"error"];
     NSString *reason = @"Unknown";
     switch (finishReason)
     {
@@ -296,12 +388,16 @@
             break;
         case MPMovieFinishReasonPlaybackError:
             reason = @"Playback Error";
+            if (error) {
+                NSLog(@"Playback Error: %@", [error localizedDescription]);
+                NSLog(@"Error details: %@", error);
+            }
             break;
         case MPMovieFinishReasonUserExited:
             reason = @"User Exited";
             break;
     }
-    //NSLog(@"Finish Reason: %@%@", reason, error ? [@"\n" stringByAppendingString:[error description]] : @"");
+    NSLog(@"Finish Reason: %@%@", reason, error ? [@"\n" stringByAppendingString:[error description]] : @"");
 }
 
 - (void) moviePlayerPlaybackStateDidChange:(NSNotification *)notification
@@ -344,29 +440,48 @@
     moviePlayerController = notification.object;
     NSMutableString *loadState = [NSMutableString new];
     MPMovieLoadState state = moviePlayerController.loadState;
+    
+    NSLog(@"Load State Raw Value: %lu", (unsigned long)state);
+    
     if (state & MPMovieLoadStatePlayable) {
-        [self.view bringSubviewToFront:_viewLoading];
         [loadState appendString:@" | Playable"];
+        
+        // Once playable, we can start playing if this is initial load
+        if (_isInitial && moviePlayerController.playbackState != MPMoviePlaybackStatePlaying) {
+            NSLog(@"Video is playable - starting playback from second 1");
+            moviePlayerController.currentPlaybackTime = 1.0;
+            [moviePlayerController play];
+            _isInitial = FALSE;  // Mark as no longer initial
+        }
     }
     if (state & MPMovieLoadStatePlaythroughOK) {
-        [self.view bringSubviewToFront:_viewLoading];
         [loadState appendString:@" | Playthrough OK"];
-        [self hideLoading];
+        [self hideLoading];  // Hide loading when playthrough is ready
     }
     if (state & MPMovieLoadStateStalled) {
         [loadState appendString:@" | Stalled"];
         [self showLoading];
     }
+    if (state == MPMovieLoadStateUnknown) {
+        [loadState appendString:@" | Unknown"];
+    }
     
     NSLog(@"Load State: %@", loadState.length > 0 ? [loadState substringFromIndex:3] : @"N/A");
+    NSLog(@"Duration: %f, Current Time: %f", moviePlayerController.duration, moviePlayerController.currentPlaybackTime);
 }
 
 - (void)updatePlaybackProgressFromTimer:(NSTimer *)timer {
-    _seekbar.maximumValue = moviePlayerController.duration;
-    _seekbar.value = moviePlayerController.currentPlaybackTime;
-    float smartWidth = 0.0;
-    smartWidth = (210 * moviePlayerController.duration ) / 100;
-    _shadowSlider.frame = CGRectMake( _shadowSlider.frame.origin.x , _shadowSlider.frame.origin.y , smartWidth , _shadowSlider.frame.size.height);
+    NSTimeInterval duration = moviePlayerController.duration;
+    NSTimeInterval currentTime = moviePlayerController.currentPlaybackTime;
+    
+    // Only update slider if we have valid duration and time values
+    if (!isnan(duration) && duration > 0 && !isnan(currentTime)) {
+        _seekbar.maximumValue = duration;
+        _seekbar.value = currentTime;
+        float smartWidth = 0.0;
+        smartWidth = (210 * duration) / 100;
+        _shadowSlider.frame = CGRectMake( _shadowSlider.frame.origin.x , _shadowSlider.frame.origin.y , smartWidth , _shadowSlider.frame.size.height);
+    }
     
     if (([UIApplication sharedApplication].applicationState == UIApplicationStateActive) && (moviePlayerController.playbackState == MPMoviePlaybackStatePlaying)) {
         
@@ -426,21 +541,27 @@
         [QueueModel setSelectedQueueID:[newQueueId integerValue]];
         UIImage *image = (boolQueued) ? [UIImage imageNamed:@"icon_queue_remove"] : [UIImage imageNamed:@"icon_queue_add"];
         
-        if (![QueueModel getHasRefreshed]) {
-            self.video.queueId = newQueueId;
-            self.video.queued = boolQueued;
-            VideoCellModel *aCell=(VideoCellModel *)self.cellSelected;
-            if (self.video.downloaded) {
-                image = [UIImage imageNamed:@"icon_queued_downloaded"];
-                if (boolQueued) {
-                    image = [UIImage imageNamed:@"icon_queue_remove"];
+        @try {
+            if (![QueueModel getHasRefreshed]) {
+                self.video.queueId = newQueueId;
+                self.video.queued = boolQueued;
+                VideoCellModel *aCell=(VideoCellModel *)self.cellSelected;
+                if (self.video.downloaded) {
+                    image = [UIImage imageNamed:@"icon_queued_downloaded"];
+                    if (boolQueued) {
+                        image = [UIImage imageNamed:@"icon_queue_remove"];
+                    }
                 }
+                if (self.video.downloading) {
+                    image = [UIImage imageNamed:@"icon_queue_downloading"];
+                }
+                [aCell.btnCellQueue setBackgroundImage:image forState:UIControlStateNormal];
             }
-            if (self.video.downloading) {
-                image = [UIImage imageNamed:@"icon_queue_downloading"];
-            }
-            [aCell.btnCellQueue setBackgroundImage:image forState:UIControlStateNormal];
         }
+        @catch (NSException * e) {
+            NSLog(@"Exception: %@", e);
+        }
+        
         [_btnQueue setBackgroundImage:image forState:UIControlStateNormal];
         [UserModel setCredits:[[queueData valueForKey:@"credits"] integerValue]];
         [UserModel setQueueCount:[[queueData valueForKey:@"queuecount"] integerValue]];

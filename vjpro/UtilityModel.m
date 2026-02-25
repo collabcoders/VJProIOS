@@ -86,6 +86,94 @@
     
     return results;
 }
+
++(void)getJsonDataAsync:(NSString *)urlpath params:(NSMutableDictionary *)params completion:(NetworkCompletionBlock)completion {
+    NSString *connectionErrorMsg = @"This app requires an internet connection and will attempt to re-establish a connection every 30 seconds.  Please make sure you have data or wifi enabled on your device.";
+    
+    @try {
+        NSURL *url = [NSURL URLWithString:urlpath];
+        NSMutableURLRequest* request = [[NSMutableURLRequest alloc] init];
+        
+        NSData *postData;
+        if (params.count > 0) {
+            postData = [self encodeDictionary:params];
+            NSString* postString = [params JSONString];
+            NSLog(@"Post data: %@", postString);
+        }
+        
+        [request setURL:url];
+        [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+        [request setTimeoutInterval:60];
+        if (params.count > 0) {
+            [request setHTTPMethod:@"POST"];
+            [request setHTTPBody:postData];
+        }
+        
+        // Use NSURLSession for async networking
+        NSURLSession *session = [NSURLSession sharedSession];
+        NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            if (error) {
+                NSLog(@"Error performing request: %@", urlpath);
+                NSLog(@"Error message: %@", [error debugDescription]);
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if ([UserModel getAlertShowing]) {
+                        // do nothing
+                    } else {
+                        [UserModel setAlertShowing:YES];
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Error" 
+                                                                        message:[NSString stringWithFormat:@"%@  %@", [error localizedDescription], connectionErrorMsg] 
+                                                                       delegate:self 
+                                                              cancelButtonTitle:nil 
+                                                              otherButtonTitles:@"OK", nil];
+                        [UtilityModel showAlertView:alert withCallback:^(NSInteger buttonIndex) {
+                            [UserModel setAlertShowing:NO];
+                        }];
+                    }
+                    
+                    if (completion) {
+                        completion(nil, error);
+                    }
+                });
+            } else {
+                NSString *jsonString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                NSDictionary *results = [jsonString objectFromJSONString];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (completion) {
+                        completion(results, nil);
+                    }
+                });
+            }
+        }];
+        
+        [task resume];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%@", exception.reason);
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([UserModel getAlertShowing]) {
+                // do nothing
+            } else {
+                [UserModel setAlertShowing:YES];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Error" 
+                                                                message:[NSString stringWithFormat:@"%@  %@", exception.reason, connectionErrorMsg] 
+                                                               delegate:self 
+                                                      cancelButtonTitle:nil 
+                                                      otherButtonTitles:@"OK", nil];
+                [UtilityModel showAlertView:alert withCallback:^(NSInteger buttonIndex) {
+                    [UserModel setAlertShowing:NO];
+                }];
+            }
+            
+            if (completion) {
+                NSError *error = [NSError errorWithDomain:@"UtilityModel" code:-1 userInfo:@{NSLocalizedDescriptionKey: exception.reason}];
+                completion(nil, error);
+            }
+        });
+    }
+}
     
     
 +(NSMutableDictionary *)getDataList:(NSString *)listName {

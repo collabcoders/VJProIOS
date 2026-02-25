@@ -11,10 +11,13 @@
 @interface UtilityModel : NSObject<UIAlertViewDelegate>
 
 typedef void (^AlertViewCompletionBlock)(NSInteger buttonIndex);
+typedef void (^NetworkCompletionBlock)(NSDictionary *result, NSError *error);
 
 @property (strong,nonatomic) AlertViewCompletionBlock callback;
 
 +(NSDictionary *)getJsonData:(NSString *)urlpath params:(NSMutableDictionary *)params;
+
++(void)getJsonDataAsync:(NSString *)urlpath params:(NSMutableDictionary *)params completion:(NetworkCompletionBlock)completion;
 
 +(NSMutableDictionary *)getDataList:(NSString *)listName;
 

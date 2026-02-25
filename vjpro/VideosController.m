@@ -64,6 +64,18 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    // Remove white space by extending view under status bar
+    if ([self respondsToSelector:@selector(wantsFullScreenLayout)]) {
+        [self setWantsFullScreenLayout:YES];
+    }
+    
+    // Force view to top of window
+    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+    CGRect frame = self.view.frame;
+    frame.origin.y = -20; // Move up by status bar height
+    self.view.frame = frame;
+    
     [self showspinner];
 }
 
@@ -86,6 +98,20 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.'
+    
+    // Extend view under status bar to eliminate white space
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {
+        self.edgesForExtendedLayout = UIRectEdgeAll;
+    }
+    
+    // Disable automatic scroll view inset adjustment
+    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
+    
+    // Set main view background to black to match design
+    self.view.backgroundColor = [UIColor blackColor];
+    
     _viewWebContainer.hidden = YES;
     
     //set defaults
@@ -106,6 +132,10 @@
      if ([self.tblVideos respondsToSelector:@selector(setSeparatorInset:)]) {
          [self.tblVideos setSeparatorInset:UIEdgeInsetsZero];
      }
+     
+     // Move table content up to eliminate white space at top
+     self.tblVideos.contentInset = UIEdgeInsetsMake(-64, 0, 0, 0);
+     self.tblVideos.scrollIndicatorInsets = UIEdgeInsetsMake(-64, 0, 0, 0);
     
     CALayer *statusBorder = [CALayer layer];
     statusBorder.frame = CGRectMake(0.0f, 22.0f, _viewStatusBar.frame.size.width, 1.0f);
@@ -135,7 +165,7 @@
     //load data
     [UserModel setAlertShowing:NO];
     [self setupTableViewFooter];
-    self.pageSize = [UserModel getPageSize];
+    self.pageSize = (int)[UserModel getPageSize];
     [self.lblTitle setText:@"Latest Releases"];
     [self newsearch];
 }
@@ -146,7 +176,7 @@
     SearchController *leftController=(SearchController *)[self.slideController getLeftViewController];
     [self showspinner];
     [leftController showspinner];
-    self.pageSize = [UserModel getPageSize];
+    self.pageSize = (int)[UserModel getPageSize];
     [self newsearch];
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
@@ -167,19 +197,21 @@
         NSString *strUrl = [NSString stringWithFormat:@"https://www.vj-pro.net/Mobile/GetUpdatedSettings/%@",strUserId];
         
         NSMutableDictionary *params = [NSMutableDictionary dictionary];
-        NSDictionary * settingData = [UtilityModel getJsonData:strUrl params:params];
-
-        if (settingData != nil) {
-            [self showStatusChanges:settingData];
-            if (self.connectionWasDropped) {
-                self.connectionWasDropped = NO;
-                [self newsearch];
-            }
-        } else {
-            self.connectionWasDropped = YES;
-        }
         
-        NSLog(@"looped");
+        // Use async version with completion handler
+        [UtilityModel getJsonDataAsync:strUrl params:params completion:^(NSDictionary *settingData, NSError *error) {
+            if (settingData != nil) {
+                [self showStatusChanges:settingData];
+                if (self.connectionWasDropped) {
+                    self.connectionWasDropped = NO;
+                    [self newsearch];
+                }
+            } else {
+                self.connectionWasDropped = YES;
+            }
+            
+            NSLog(@"looped");
+        }];
     }
 }
 
@@ -303,6 +335,12 @@
     NSString * strCredits = [NSString stringWithFormat:@"%ld CR", (long)result.credits];
     NSString *imgHd = @"blank";
     int hd = (int)result.quality;
+    if (hd == 3) {
+        imgHd = @"icon_qhd";
+        [aCell.imgCellHd setImage:[UIImage imageNamed:imgHd]];
+        [aCell.lblCellTitleNonHd setText:@""];
+        [aCell.lblCellTitle setText:[NSString stringWithFormat:@"%@ [%@]", result.Title,result.version]];
+    }
     if (hd == 2) {
         imgHd = @"icon_1080";
         [aCell.imgCellHd setImage:[UIImage imageNamed:imgHd]];
@@ -382,7 +420,7 @@
         [leftController showspinner];
         [SearchModel resetParams];
         //[SortModel loadSortList];
-        self.pageSize = [UserModel getPageSize];
+        self.pageSize = (int)[UserModel getPageSize];
         [self.lblTitle setText:@"Latest Releases"];
         [self newsearch];
     }
@@ -392,7 +430,7 @@
         [SearchModel resetParams];
         [SearchModel setProgram:@"queued"];
         //[SortModel loadSortList];
-        self.pageSize = [UserModel getPageSize];
+        self.pageSize = (int)[UserModel getPageSize];
         [self.lblTitle setText:@"My Queue"];
         [self newsearch];
     }
@@ -402,7 +440,7 @@
         [SearchModel resetParams];
         [SearchModel setProgram:@"downloads"];
         //[SortModel loadSortList];
-        self.pageSize = [UserModel getPageSize];
+        self.pageSize = (int)[UserModel getPageSize];
         [self.lblTitle setText:@"My Downloads"];
         [self newsearch];
     }
@@ -534,7 +572,7 @@
     
     NSInteger i = [self.paginator.results count] - [results count];
  
-    int resultsCount = [results count];
+    int resultsCount = (int)[results count];
     //for(NSDictionary *result in results)
     for (int c = 0; c < resultsCount; ++c)
     {

@@ -23,11 +23,16 @@
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
-    [super setSelected:selected animated:animated];
-    // Configure the view for the selected state
-    UIView *backgroundView = [[UIView alloc] initWithFrame:self.selectedBackgroundView.frame];
-    [backgroundView setBackgroundColor:[UIColor grayColor]];
-    [self setSelectedBackgroundView:backgroundView];
+    @try {
+        [super setSelected:selected animated:animated];
+        // Configure the view for the selected state
+        UIView *backgroundView = [[UIView alloc] initWithFrame:self.selectedBackgroundView.frame];
+        [backgroundView setBackgroundColor:[UIColor grayColor]];
+        [self setSelectedBackgroundView:backgroundView];
+    }
+    @catch (NSException * e) {
+        NSLog(@"Exception: %@", e);
+    }
 }
 
 @end

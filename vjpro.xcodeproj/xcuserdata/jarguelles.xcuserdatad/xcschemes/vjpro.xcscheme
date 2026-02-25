@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0500"
+   LastUpgradeVersion = "0510"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DB58A183183CEBAE00621EED"
-               BuildableName = "vjpro.app"
+               BuildableName = "VJ-Pro.app"
                BlueprintName = "vjpro"
                ReferencedContainer = "container:vjpro.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DB58A183183CEBAE00621EED"
-            BuildableName = "vjpro.app"
+            BuildableName = "VJ-Pro.app"
             BlueprintName = "vjpro"
             ReferencedContainer = "container:vjpro.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DB58A183183CEBAE00621EED"
-            BuildableName = "vjpro.app"
+            BuildableName = "VJ-Pro.app"
             BlueprintName = "vjpro"
             ReferencedContainer = "container:vjpro.xcodeproj">
          </BuildableReference>
@@ -80,7 +80,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DB58A183183CEBAE00621EED"
-            BuildableName = "vjpro.app"
+            BuildableName = "VJ-Pro.app"
             BlueprintName = "vjpro"
             ReferencedContainer = "container:vjpro.xcodeproj">
          </BuildableReference>

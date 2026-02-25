@@ -57,13 +57,33 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
+    // Extend view under status bar to eliminate white space
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {
+        self.edgesForExtendedLayout = UIRectEdgeAll;
+    }
+    
+    // Disable automatic scroll view inset adjustment
+    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
+    
+    // Set main view background to black to match design
+    self.view.backgroundColor = [UIColor blackColor];
+    
     [_txtKeywords setReturnKeyType:UIReturnKeySearch];
+    
+    // Set text field background to dark to eliminate white bar
+    _txtKeywords.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1.0];
     
 //    UIStoryboard*  sb = [UIStoryboard storyboardWithName:@"Main_iPhone"
 //                                                  bundle:nil];
 //    self.videosConroller = [sb instantiateViewControllerWithIdentifier:@"SKStoryBoardIdentifierMain"];
     [[_btnSearch layer] setBorderWidth:1.0f];
     [[_btnSearch layer] setBorderColor:[UIColor blackColor].CGColor];
+    
+    // Set HD option view background to black to eliminate white bar
+    _viewHdOption.backgroundColor = [UIColor blackColor];
     
     static BOOL didInitialize = NO;
     _segmentedControl1 = [[AKSegmentedControl alloc] initWithFrame:CGRectMake(-1, -1, 272.0, 43.0)];
@@ -122,6 +142,11 @@
     [self.view addSubview:_spinner];
     
     _tblGenres.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1.0];
+    
+    // Move table content up to eliminate white space at top
+    _tblGenres.contentInset = UIEdgeInsetsMake(-20, 0, 0, 0);
+    _tblGenres.scrollIndicatorInsets = UIEdgeInsetsMake(-20, 0, 0, 0);
+    
 //    if ([_tblGenres respondsToSelector:@selector(setSeparatorInset:)]) {
 //        [_tblGenres setSeparatorInset:UIEdgeInsetsZero];
 //    }
@@ -129,9 +154,55 @@
     
     _txtKeywords.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, 20)];
     _txtKeywords.leftViewMode = UITextFieldViewModeAlways;
-    _txtKeywords.background = [[UIImage imageNamed:@"image"] stretchableImageWithLeftCapWidth:7 topCapHeight:17];
+    // Remove white background image and set to dark color instead
+    _txtKeywords.background = nil;
+    _txtKeywords.borderStyle = UITextBorderStyleRoundedRect;
+    
+    // Set text field superview background to black
+    if (_txtKeywords.superview) {
+        _txtKeywords.superview.backgroundColor = [UIColor blackColor];
+    }
+    
+    // Find and fix any white background views
+    for (UIView *subview in self.view.subviews) {
+        // Change any white backgrounds to black
+        if (subview.backgroundColor == nil || 
+            CGColorEqualToColor(subview.backgroundColor.CGColor, [UIColor whiteColor].CGColor) ||
+            CGColorEqualToColor(subview.backgroundColor.CGColor, [UIColor clearColor].CGColor)) {
+            subview.backgroundColor = [UIColor blackColor];
+        }
+    }
     
     didInitialize = YES;
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    // Remove white space by extending view under status bar
+    if ([self respondsToSelector:@selector(wantsFullScreenLayout)]) {
+        [self setWantsFullScreenLayout:YES];
+    }
+    
+    // Force view to top of window - removed the -20 offset that was causing issues
+    CGRect frame = self.view.frame;
+    frame.origin.y = 0;
+    self.view.frame = frame;
+    
+    // Move text field up to eliminate white space
+    CGRect txtFrame = _txtKeywords.frame;
+    txtFrame.origin.y = 0;
+    _txtKeywords.frame = txtFrame;
+    
+    // Move button up as well
+    CGRect btnFrame = _btnSearch.frame;
+    btnFrame.origin.y = 0;
+    _btnSearch.frame = btnFrame;
+}
+
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    // Removed black overlay that was creating the black line
 }
 
 - (void)setupSegmentedControl1
@@ -207,7 +278,7 @@
         VideosController *mainController=(VideosController *)[self.slideController getMainViewController];
         [self showspinner];
         [mainController showspinner];
-        mainController.pageSize = [UserModel getPageSize];
+        mainController.pageSize = (int)[UserModel getPageSize];
         [mainController newsearch];
     }
     //NSLog(@"SegmentedControl #1 : Selected Index %@", [segmentedControl selectedIndexes]);
@@ -311,7 +382,7 @@
     [self showspinner];
     [mainController showspinner];
     [mainController.lblTitle setText:result.genre];
-    mainController.pageSize = [UserModel getPageSize];
+    mainController.pageSize = (int)[UserModel getPageSize];
     [mainController newsearch];
     
     [self.slideController showMainContainerViewAnimated:YES];
@@ -362,7 +433,7 @@
         [mainController showspinner];
         NSString * strTitle = [NSString stringWithFormat:@"Search: \"%@\"", trimmedKeywords];
         [mainController.lblTitle setText:strTitle];
-        mainController.pageSize = [UserModel getPageSize];
+        mainController.pageSize = (int)[UserModel getPageSize];
         [mainController newsearch];
         
         [self.slideController showMainContainerViewAnimated:YES];

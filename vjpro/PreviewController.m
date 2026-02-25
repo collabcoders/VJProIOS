@@ -72,6 +72,28 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    // Force the slide menu to close completely
+    if (self.slideController) {
+        [self.slideController showMainContainerViewAnimated:NO];
+    }
+    
+    NSLog(@"🔍 viewWillAppear - btnPreview frame: %@", NSStringFromCGRect(_btnPreview.frame));
+    NSLog(@"🔍 viewWillAppear - view bounds: %@", NSStringFromCGRect(self.view.bounds));
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    NSLog(@"🔍 viewDidAppear - btnPreview frame: %@", NSStringFromCGRect(_btnPreview.frame));
+    NSLog(@"🔍 viewDidAppear - self.view frame: %@", NSStringFromCGRect(self.view.frame));
+    NSLog(@"🔍 viewDidAppear - self.view bounds: %@", NSStringFromCGRect(self.view.bounds));
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    // No aggressive frame manipulation
 }
 
 - (void)viewDidLoad
@@ -79,10 +101,16 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     
-    // Extend view under status bar
+    // Don't extend under status bar
     if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {
-        self.edgesForExtendedLayout = UIRectEdgeTop;
+        self.edgesForExtendedLayout = UIRectEdgeNone;
     }
+    
+    if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
+        self.automaticallyAdjustsScrollViewInsets = NO;
+    }
+    
+    NSLog(@"🎯 viewDidLoad - view frame: %@", NSStringFromCGRect(self.view.frame));
     
     // Set main view background to black to match design
     self.view.backgroundColor = [UIColor blackColor];
@@ -299,11 +327,20 @@
     
     
     moviePlayerController.view.backgroundColor = [UIColor clearColor];
-    [moviePlayerController.view setFrame:CGRectMake(_btnPreview.frame.origin.x,
-                                                    _btnPreview.frame.origin.y,
-                                                    _btnPreview.frame.size.width,
-                                                    _btnPreview.frame.size.height)];
+    // Position at top (y=0) to eliminate white space above video
+    CGFloat videoWidth = self.view.bounds.size.width;
+    CGFloat videoHeight = videoWidth * (9.0/16.0);
+    
+    NSLog(@"🎬 Setting movie player frame - width: %.1f, height: %.1f", videoWidth, videoHeight);
+    NSLog(@"🎬 btnPreview frame before video: %@", NSStringFromCGRect(_btnPreview.frame));
+    
+    [moviePlayerController.view setFrame:CGRectMake(0,
+                                                    0,
+                                                    videoWidth,
+                                                    videoHeight)];
     moviePlayerController.controlStyle = MPMovieControlStyleNone;
+    
+    NSLog(@"🎬 Movie player frame set to: %@", NSStringFromCGRect(moviePlayerController.view.frame));
     
     // Disable VisionKit interactions that may trigger background removal warnings
     if (@available(iOS 16.0, *)) {

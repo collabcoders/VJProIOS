@@ -133,9 +133,9 @@
          [self.tblVideos setSeparatorInset:UIEdgeInsetsZero];
      }
      
-     // Move table content up to eliminate white space at top
-     self.tblVideos.contentInset = UIEdgeInsetsMake(-64, 0, 0, 0);
-     self.tblVideos.scrollIndicatorInsets = UIEdgeInsetsMake(-64, 0, 0, 0);
+     // Position table content flush below status bar (no gap)
+     self.tblVideos.contentInset = UIEdgeInsetsMake(0, 0, 0, 0);
+     self.tblVideos.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, 0, 0);
     
     CALayer *statusBorder = [CALayer layer];
     statusBorder.frame = CGRectMake(0.0f, 22.0f, _viewStatusBar.frame.size.width, 1.0f);
@@ -161,6 +161,19 @@
                                        userInfo:nil
                                         repeats:YES];
     NSLog(@"loop started");
+    
+    // Customize tab bar spacing: reduce vertical space under icons and increase perceived horizontal spacing
+    // Tab bar layout: show full labels and clearly reduce the gap between icon and label
+    if (_tabBar && _tabBar.items.count > 0) {
+        for (UITabBarItem *item in _tabBar.items) {
+            // Reset image insets so the image is centered
+            item.imageInsets = UIEdgeInsetsZero;
+
+            // Strongly reduce the space between the icon and the label by moving the title up
+            // Try -5.0 or -6.0 for a more obvious change
+            [item setTitlePositionAdjustment:UIOffsetMake(0.0, -5.0)];
+        }
+    }
     
     //load data
     [UserModel setAlertShowing:NO];
@@ -605,9 +618,9 @@
 
 - (void)setupTableViewFooter {
     // set up label
-    UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    UIView *footerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320, 24)];
     footerView.backgroundColor = [UIColor clearColor];
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, 24)];
     label.font = [UIFont boldSystemFontOfSize:16];
     label.textColor = [UIColor whiteColor];
     label.textAlignment = NSTextAlignmentCenter;
@@ -617,7 +630,7 @@
     
     // set up activity indicator
     UIActivityIndicatorView *activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    activityIndicatorView.center = CGPointMake(40, 22);
+    activityIndicatorView.center = CGPointMake(40, 12);
     activityIndicatorView.hidesWhenStopped = YES;
     
     self.activityIndicator = activityIndicatorView;

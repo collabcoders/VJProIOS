@@ -14,6 +14,10 @@
 @synthesize callback;
     
 +(NSDictionary *)getJsonData:(NSString *)urlpath params:(NSMutableDictionary *)params {
+    // Suppress deprecation warning for NSURLConnection
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    
     NSDictionary *results;
     NSString *connectionErrorMsg = @"This app requires an internet connection and will attempt to re-establish a connection every 30 seconds.  Please make sure you have data or wifi enabled on your device.";
     
@@ -42,7 +46,30 @@
         
         NSError* error = nil;
         NSURLResponse* response = nil;
-        NSData* data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+        
+        // Perform synchronous request (note: this blocks the calling thread)
+        NSData* data;
+        if ([NSThread isMainThread]) {
+            // If on main thread, dispatch to background to avoid blocking UI
+            dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+            __block NSData *asyncData = nil;
+            __block NSURLResponse *asyncResponse = nil;
+            __block NSError *asyncError = nil;
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                asyncData = [NSURLConnection sendSynchronousRequest:request returningResponse:&asyncResponse error:&asyncError];
+                dispatch_semaphore_signal(semaphore);
+            });
+            
+            dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+            data = asyncData;
+            response = asyncResponse;
+            error = asyncError;
+        } else {
+            // Already on background thread, can call synchronously
+            data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+        }
+        
         if (error) {
             NSLog(@"Error performing request: %@", urlpath);
             NSLog(@"Error message: %@", [error debugDescription]);
@@ -85,6 +112,8 @@
     }*/
     
     return results;
+    
+    #pragma clang diagnostic pop
 }
 
 +(void)getJsonDataAsync:(NSString *)urlpath params:(NSMutableDictionary *)params completion:(NetworkCompletionBlock)completion {

@@ -10,8 +10,19 @@
 
 @implementation AppDelegate
 
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // Set global tab bar item title font (normal state)
+    [[UITabBarItem appearance] setTitleTextAttributes:@{
+        NSFontAttributeName: [UIFont systemFontOfSize:10.0]
+    } forState:UIControlStateNormal];
+
+    // Optionally match the selected state too
+    [[UITabBarItem appearance] setTitleTextAttributes:@{
+        NSFontAttributeName: [UIFont systemFontOfSize:10.0]
+    } forState:UIControlStateSelected];
+    
     // Override point for customization after application launch.
     self.window.tintColor = [UIColor whiteColor];
     
@@ -25,6 +36,39 @@
     CGRect windowFrame = self.window.frame;
     windowFrame.origin.y = 0;
     self.window.frame = windowFrame;
+    
+    // Remove glass/blur effect from tab bar by using an opaque background
+    if (@available(iOS 13.0, *)) {
+        UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
+        // Start from a plain, opaque background (no blur)
+        [appearance configureWithOpaqueBackground];
+        appearance.backgroundColor = [UIColor blackColor]; // match app design
+
+        // Optional: set item title colors to ensure readability
+        NSDictionary *normalAttrs = @{ NSForegroundColorAttributeName: [UIColor whiteColor] };
+        NSDictionary *selectedAttrs = @{ NSForegroundColorAttributeName: [UIColor whiteColor] };
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttrs;
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttrs;
+        appearance.inlineLayoutAppearance.normal.titleTextAttributes = normalAttrs;
+        appearance.inlineLayoutAppearance.selected.titleTextAttributes = selectedAttrs;
+        appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = normalAttrs;
+        appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = selectedAttrs;
+
+        // Apply globally
+        UITabBar *tabBarAppearanceProxy = [UITabBar appearance];
+        tabBarAppearanceProxy.standardAppearance = appearance;
+        if (@available(iOS 15.0, *)) {
+            tabBarAppearanceProxy.scrollEdgeAppearance = appearance;
+        }
+
+        // Also disable translucency to avoid glass effect
+        tabBarAppearanceProxy.translucent = NO;
+    } else {
+        // Fallback for older iOS: disable translucency and set a solid bar tint
+        [[UITabBar appearance] setTranslucent:NO];
+        [[UITabBar appearance] setBarTintColor:[UIColor blackColor]];
+        [[UITabBar appearance] setTintColor:[UIColor whiteColor]];
+    }
     
     return YES;
 }
@@ -57,3 +101,4 @@
 }
 
 @end
+

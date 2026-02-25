@@ -183,21 +183,6 @@
     if ([self respondsToSelector:@selector(wantsFullScreenLayout)]) {
         [self setWantsFullScreenLayout:YES];
     }
-    
-    // Force view to top of window - removed the -20 offset that was causing issues
-    CGRect frame = self.view.frame;
-    frame.origin.y = 0;
-    self.view.frame = frame;
-    
-    // Move text field up to eliminate white space
-    CGRect txtFrame = _txtKeywords.frame;
-    txtFrame.origin.y = 0;
-    _txtKeywords.frame = txtFrame;
-    
-    // Move button up as well
-    CGRect btnFrame = _btnSearch.frame;
-    btnFrame.origin.y = 0;
-    _btnSearch.frame = btnFrame;
 }
 
 -(void)viewDidAppear:(BOOL)animated {

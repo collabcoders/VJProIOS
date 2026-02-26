@@ -68,17 +68,34 @@
     
     [_txtKeywords setReturnKeyType:UIReturnKeySearch];
     
-    // Set text field background to dark to eliminate white bar
-    _txtKeywords.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1.0];
+    // Set text field background to white
+    _txtKeywords.backgroundColor = [UIColor whiteColor];
     
 //    UIStoryboard*  sb = [UIStoryboard storyboardWithName:@"Main_iPhone"
 //                                                  bundle:nil];
 //    self.videosConroller = [sb instantiateViewControllerWithIdentifier:@"SKStoryBoardIdentifierMain"];
+    
+    // Replace "Search" text with search icon
+    [_btnSearch setTitle:@"" forState:UIControlStateNormal];
+    if (@available(iOS 13.0, *)) {
+        // Use SF Symbols for iOS 13+
+        UIImage *searchIcon = [UIImage systemImageNamed:@"magnifyingglass"];
+        [_btnSearch setImage:searchIcon forState:UIControlStateNormal];
+        [_btnSearch setTintColor:[UIColor whiteColor]];
+    } else {
+        // Fallback for older iOS versions - use Unicode search symbol
+        [_btnSearch setTitle:@"🔍" forState:UIControlStateNormal];
+        [_btnSearch.titleLabel setFont:[UIFont systemFontOfSize:20]];
+    }
+    
     [[_btnSearch layer] setBorderWidth:1.0f];
     [[_btnSearch layer] setBorderColor:[UIColor blackColor].CGColor];
     
     // Set HD option view background to black to eliminate white bar
     _viewHdOption.backgroundColor = [UIColor blackColor];
+    
+    // Hide the HD filter buttons
+    _viewHdOption.hidden = YES;
     
     static BOOL didInitialize = NO;
     _segmentedControl1 = [[AKSegmentedControl alloc] initWithFrame:CGRectMake(-1, -1, 272.0, 43.0)];
@@ -138,9 +155,22 @@
     
     _tblGenres.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1.0];
     
-    // Remove or adjust any contentInset or scrollIndicatorInsets that add white space at the top
-    _tblGenres.contentInset = UIEdgeInsetsMake(-20, 0, 0, 0);
-    _tblGenres.scrollIndicatorInsets = UIEdgeInsetsMake(-20, 0, 0, 0);
+    // Position the table view below the search controls
+    // Calculate the bottom of the search button
+    CGFloat searchControlsBottom = MAX(CGRectGetMaxY(_txtKeywords.frame), CGRectGetMaxY(_btnSearch.frame));
+    
+    // Add some padding
+    CGFloat padding = 0;
+    
+    // Adjust the table view frame to start below the search controls
+    CGRect tableFrame = _tblGenres.frame;
+    tableFrame.origin.y = searchControlsBottom + padding;
+    tableFrame.size.height = self.view.frame.size.height - tableFrame.origin.y;
+    _tblGenres.frame = tableFrame;
+    
+    // Reset content insets
+    _tblGenres.contentInset = UIEdgeInsetsZero;
+    _tblGenres.scrollIndicatorInsets = UIEdgeInsetsZero;
     
 //    if ([_tblGenres respondsToSelector:@selector(setSeparatorInset:)]) {
 //        [_tblGenres setSeparatorInset:UIEdgeInsetsZero];
@@ -149,8 +179,7 @@
     
     _txtKeywords.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, 20)];
     _txtKeywords.leftViewMode = UITextFieldViewModeAlways;
-    // Remove white background image and set to dark color instead
-    _txtKeywords.background = nil;
+    // Keep white background
     _txtKeywords.borderStyle = UITextBorderStyleRoundedRect;
     
     // Set text field superview background to black
@@ -158,8 +187,12 @@
         _txtKeywords.superview.backgroundColor = [UIColor blackColor];
     }
     
-    // Find and fix any white background views
+    // Find and fix any white background views (except the search text field)
     for (UIView *subview in self.view.subviews) {
+        // Skip the text field - we want it to stay white
+        if (subview == _txtKeywords || subview == _txtKeywords.superview) {
+            continue;
+        }
         // Change any white backgrounds to black
         if (subview.backgroundColor == nil || 
             CGColorEqualToColor(subview.backgroundColor.CGColor, [UIColor whiteColor].CGColor) ||
@@ -323,13 +356,18 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [_txtKeywords resignFirstResponder];
+    
+    // Reset all cells to their default state
     NSArray *cells = [tableView visibleCells];
     for (GenreCellModel *cell in cells)
     {
         cell.lblGenreTitle.textColor = [UIColor lightGrayColor];
+        cell.contentView.backgroundColor = [UIColor clearColor];
     }
+    
+    // Set the selected cell to dark grey background with white text
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    cell.contentView.backgroundColor = [UIColor darkTextColor];
+    cell.contentView.backgroundColor = [UIColor darkGrayColor];
     GenreCellModel* theCell = (GenreCellModel*)[tableView cellForRowAtIndexPath:indexPath];
     theCell.lblGenreTitle.textColor = [UIColor whiteColor];
     UIImageView * customSeparator = [[UIImageView alloc] initWithFrame:CGRectMake(0, (cell.frame.origin.y), 320, 1)];

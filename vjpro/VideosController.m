@@ -250,7 +250,7 @@
             //_imgDownloader.image = [UIImage imageNamed:@"dot_red"];
             //[_lblDownloader setText:@"Downloader Offline"];
         }
-        [_lblCreditStatus setText:[NSString stringWithFormat:@"✅Queued: %ld / 💳Credits: %ld", (long)[UserModel getQueueCount],(long)[UserModel getCredits]]];
+        [_lblCreditStatus setText:[NSString stringWithFormat:@"✅ Queued: %ld            ⭐️ Credits: %ld", (long)[UserModel getQueueCount],(long)[UserModel getCredits]]];
         [UIView beginAnimations:nil context:NULL];
         [UIView setAnimationDuration:1.0];
         [_viewStatusBar setAlpha:0.6];

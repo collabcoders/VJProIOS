@@ -112,7 +112,7 @@
     
     //[_background removeFromSuperview];
     _background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background_login"]];
-    _background.contentMode = UIViewContentModeScaleAspectFill;
+    _background.contentMode = UIViewContentModeScaleAspectFill; // Maintains aspect ratio and fills screen
     _background.clipsToBounds = YES;
     _background.frame = self.view.bounds; // Will be updated in viewDidLayoutSubviews
     [self.view addSubview:_background];
@@ -206,9 +206,19 @@
     // Update background frame to match the actual view size (works for all device sizes)
     if (_background) {
         _background.frame = self.view.bounds;
-        NSLog(@"Background resized to: %@", NSStringFromCGRect(_background.frame));
+        
+        // Debug logging
+        NSLog(@"=== BACKGROUND DEBUG ===");
+        NSLog(@"Screen bounds: %@", NSStringFromCGRect([UIScreen mainScreen].bounds));
+        NSLog(@"View bounds: %@", NSStringFromCGRect(self.view.bounds));
+        NSLog(@"View frame: %@", NSStringFromCGRect(self.view.frame));
+        NSLog(@"Background frame: %@", NSStringFromCGRect(_background.frame));
+        NSLog(@"Background image size: %@", NSStringFromCGSize(_background.image.size));
+        NSLog(@"=======================");
     }
 }
+
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -217,23 +227,16 @@
 }
 
 -(void)keyboardWillShow {
-    // Animate the current view out of the way
+    // Move view up when keyboard appears
     if (self.view.frame.origin.y >= 0)
     {
         [self setViewMovedUp:YES];
-    }
-    else if (self.view.frame.origin.y < 0)
-    {
-        [self setViewMovedUp:NO];
     }
 }
 
 -(void)keyboardWillHide {
-    if (self.view.frame.origin.y >= 0)
-    {
-        [self setViewMovedUp:YES];
-    }
-    else if (self.view.frame.origin.y < 0)
+    // Move view back down when keyboard disappears
+    if (self.view.frame.origin.y < 0)
     {
         [self setViewMovedUp:NO];
     }

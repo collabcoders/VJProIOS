@@ -736,6 +736,7 @@
 				TargetAttributes = {
 					DB58A183183CEBAE00621EED = {
 						DevelopmentTeam = 599267FNH5;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -1039,9 +1040,10 @@
 		DB58A1BA183CEBAF00621EED /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2000;
+				DEVELOPMENT_TEAM = 599267FNH5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vjpro/vjpro-Prefix.pch";
 				INFOPLIST_FILE = "vjpro/vjpro-Info.plist";
@@ -1051,6 +1053,7 @@
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_NAME = "VJ-Pro";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1059,9 +1062,10 @@
 		DB58A1BB183CEBAF00621EED /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution: johnny ARGUELLES (599267FNH5)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: johnny ARGUELLES (599267FNH5)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2000;
+				DEVELOPMENT_TEAM = 599267FNH5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vjpro/vjpro-Prefix.pch";
 				INFOPLIST_FILE = "vjpro/vjpro-Info.plist";
@@ -1071,6 +1075,7 @@
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_NAME = "VJ-Pro";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

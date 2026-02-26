@@ -71,6 +71,14 @@
     // Set text field background to white
     _txtKeywords.backgroundColor = [UIColor whiteColor];
     
+    // Ensure search text is always readable: black text and dark placeholder
+    _txtKeywords.textColor = [UIColor blackColor];
+    if (_txtKeywords.placeholder.length > 0) {
+        _txtKeywords.attributedPlaceholder = [[NSAttributedString alloc] initWithString:_txtKeywords.placeholder attributes:@{NSForegroundColorAttributeName: [UIColor darkGrayColor]}];
+    }
+    // Force light keyboard appearance to match white field
+    _txtKeywords.keyboardAppearance = UIKeyboardAppearanceLight;
+    
 //    UIStoryboard*  sb = [UIStoryboard storyboardWithName:@"Main_iPhone"
 //                                                  bundle:nil];
 //    self.videosConroller = [sb instantiateViewControllerWithIdentifier:@"SKStoryBoardIdentifierMain"];
@@ -181,6 +189,10 @@
     _txtKeywords.leftViewMode = UITextFieldViewModeAlways;
     // Keep white background
     _txtKeywords.borderStyle = UITextBorderStyleRoundedRect;
+    
+    // Reinforce colors in case of trait changes
+    _txtKeywords.textColor = [UIColor blackColor];
+    _txtKeywords.backgroundColor = [UIColor whiteColor];
     
     // Set text field superview background to black
     if (_txtKeywords.superview) {
@@ -470,6 +482,16 @@
         [self.slideController showMainContainerViewAnimated:YES];
     } else {
         [UtilityModel showAlert:@"Invalid Search" msg:@"Keyword(s) must be at least 3 characters in length."];
+    }
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    // Keep the search field readable across appearances
+    _txtKeywords.textColor = [UIColor blackColor];
+    _txtKeywords.backgroundColor = [UIColor whiteColor];
+    if (_txtKeywords.placeholder.length > 0) {
+        _txtKeywords.attributedPlaceholder = [[NSAttributedString alloc] initWithString:_txtKeywords.placeholder attributes:@{NSForegroundColorAttributeName: [UIColor darkGrayColor]}];
     }
 }
 

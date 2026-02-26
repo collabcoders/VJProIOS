@@ -386,9 +386,9 @@
                                 <color key="backgroundColor" red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                             <tabBar contentMode="scaleToFill" fixedFrame="YES" barStyle="black" translatesAutoresizingMaskIntoConstraints="NO" id="ycN-QD-7pe">
-                                <rect key="frame" x="-17" y="745" width="427" height="48"/>
+                                <rect key="frame" x="-17" y="731" width="427" height="48"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <color key="backgroundColor" systemColor="viewFlipsideBackgroundColor"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <items>
                                     <tabBarItem title="Sort List" image="tab_sort.png" id="ZuU-fl-3jW"/>
                                     <tabBarItem title="Show All" image="tab_refresh.png" id="xTK-dc-Ssf"/>
@@ -398,7 +398,7 @@
                                     <tabBarItem title="Log Out" image="tab_logout.png" id="lgN-jD-PsI"/>
                                 </items>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <color key="selectedImageTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="selectedImageTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <outlet property="delegate" destination="VeY-9x-Exa" id="2Fn-A9-2Pp"/>
                                 </connections>
@@ -422,7 +422,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="weF-O8-iVi" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="762.59541984732823" y="165.14084507042256"/>
+            <point key="canvasLocation" x="785" y="342"/>
         </scene>
         <!--Search Controller-->
         <scene sceneID="0R6-Tg-q0x">
@@ -783,7 +783,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BmB-Hj-QIs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="763" y="798"/>
+            <point key="canvasLocation" x="793" y="1105"/>
         </scene>
     </scenes>
     <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

@@ -70,11 +70,8 @@
         [self setWantsFullScreenLayout:YES];
     }
     
-    // Force view to top of window
-    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-    CGRect frame = self.view.frame;
-    frame.origin.y = -20; // Move up by status bar height
-    self.view.frame = frame;
+    // Removed code that moved view frame up by -20
+    //[...]
     
     [self showspinner];
 }
@@ -149,8 +146,8 @@
     
     //load status bar
     [_viewStatusBar setAlpha:0.6];
-    _imgDownloader.image = [UIImage imageNamed:@"dot_yellow"];
-    [_lblDownloader setText:@"Checking Status..."];
+    //_imgDownloader.image = [UIImage imageNamed:@"dot_yellow"];
+    //[_lblDownloader setText:@"Checking Status..."];
     [self updateStatus];
     [self.statusTimer invalidate];
     self.statusTimer = nil;
@@ -173,6 +170,13 @@
             // Try -5.0 or -6.0 for a more obvious change
             [item setTitlePositionAdjustment:UIOffsetMake(0.0, -5.0)];
         }
+    }
+
+    if (_tabBar) {
+        _tabBar.backgroundImage = [UIImage new];
+        _tabBar.shadowImage = [UIImage new];
+        _tabBar.backgroundColor = [UIColor clearColor];
+        _tabBar.translucent = YES;
     }
     
     //load data
@@ -240,13 +244,13 @@
         [_viewStatusBar setAlpha:1.0];
         [UIView commitAnimations];
         if ([UserModel getDownloaderOnline]) {
-            _imgDownloader.image = [UIImage imageNamed:@"dot_green"];
-            [_lblDownloader setText:@"Downloader Online"];
+            //_imgDownloader.image = [UIImage imageNamed:@"dot_green"];
+            //[_lblDownloader setText:@"Downloader Online"];
         } else {
-            _imgDownloader.image = [UIImage imageNamed:@"dot_red"];
-            [_lblDownloader setText:@"Downloader Offline"];
+            //_imgDownloader.image = [UIImage imageNamed:@"dot_red"];
+            //[_lblDownloader setText:@"Downloader Offline"];
         }
-        [_lblCreditStatus setText:[NSString stringWithFormat:@"Queued: %ld, Credits: %ld", (long)[UserModel getQueueCount],(long)[UserModel getCredits]]];
+        [_lblCreditStatus setText:[NSString stringWithFormat:@"✅Queued: %ld / 💳Credits: %ld", (long)[UserModel getQueueCount],(long)[UserModel getCredits]]];
         [UIView beginAnimations:nil context:NULL];
         [UIView setAnimationDuration:1.0];
         [_viewStatusBar setAlpha:0.6];
@@ -673,3 +677,4 @@
 }
 
 @end
+

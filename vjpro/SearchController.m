@@ -56,19 +56,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
-    
-    // Extend view under status bar to eliminate white space
+    // Force the view to extend to the very top and avoid extra white space
     if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)]) {
         self.edgesForExtendedLayout = UIRectEdgeAll;
     }
-    
-    // Disable automatic scroll view inset adjustment
     if ([self respondsToSelector:@selector(setAutomaticallyAdjustsScrollViewInsets:)]) {
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
-    
-    // Set main view background to black to match design
+    self.extendedLayoutIncludesOpaqueBars = YES;
     self.view.backgroundColor = [UIColor blackColor];
     
     [_txtKeywords setReturnKeyType:UIReturnKeySearch];
@@ -143,7 +138,7 @@
     
     _tblGenres.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1.0];
     
-    // Move table content up to eliminate white space at top
+    // Remove or adjust any contentInset or scrollIndicatorInsets that add white space at the top
     _tblGenres.contentInset = UIEdgeInsetsMake(-20, 0, 0, 0);
     _tblGenres.scrollIndicatorInsets = UIEdgeInsetsMake(-20, 0, 0, 0);
     
@@ -428,3 +423,4 @@
 }
 
 @end
+

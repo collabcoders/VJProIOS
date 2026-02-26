@@ -324,9 +324,22 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    UIImageView * customSeparator = [[UIImageView alloc] initWithFrame:CGRectMake(0, (cell.frame.origin.y), 320, 1)];
-    [customSeparator setImage:[UIImage imageNamed:@"seperator"]];
-    [cell.contentView addSubview:customSeparator];
+    // Add 1px dark grey border to the bottom of the cell
+    CALayer *bottomBorder = [CALayer layer];
+    bottomBorder.frame = CGRectMake(0, cell.frame.size.height - 1, cell.frame.size.width, 1);
+    bottomBorder.backgroundColor = [UIColor darkGrayColor].CGColor;
+    
+    // Remove any existing bottom borders to avoid duplicates
+    if (cell.contentView.layer.sublayers.count > 0) {
+        NSArray *sublayers = [cell.contentView.layer.sublayers copy];
+        for (CALayer *layer in sublayers) {
+            if (layer.frame.size.height == 1) {
+                [layer removeFromSuperlayer];
+            }
+        }
+    }
+    
+    [cell.contentView.layer addSublayer:bottomBorder];
     
     GenreModel *keys = [self getSelectedGenre:indexPath];
     GenreCellModel *gCell=(GenreCellModel *)cell;

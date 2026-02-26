@@ -146,6 +146,9 @@ SKControllerBounds SKControllerBoundsMake(CGFloat minX,CGFloat maxX){
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    
+    // Set background color to black
+    self.view.backgroundColor = [UIColor blackColor];
 }
 
 - (void)didReceiveMemoryWarning
@@ -156,6 +159,61 @@ SKControllerBounds SKControllerBoundsMake(CGFloat minX,CGFloat maxX){
 
 -(void)viewDidAppear:(BOOL)animated{
     
+}
+
+// Added method to hide/remove persistent white bar subview
+-(void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    // DISABLED - was removing too many views
+    // If you need to remove a specific white bar, re-enable and make very specific
+    
+    /*
+    NSMutableArray *viewsToRemove = [NSMutableArray array];
+    
+    for (UIView *subview in self.view.subviews) {
+        // Skip our known views
+        if (subview == _mView || subview == _lView || subview == _rView) {
+            continue;
+        }
+        
+        // Skip view controller views
+        if (subview == self.mainViewController.view || 
+            subview == self.leftViewController.view || 
+            subview == self.rightViewController.view) {
+            continue;
+        }
+        
+        // Skip any view that has subviews (it's probably a container)
+        if (subview.subviews.count > 0) {
+            continue;
+        }
+        
+        CGRect f = subview.frame;
+        
+        // ONLY target very specific white bars:
+        // - At the very top (y < 3)
+        // - Very thin (height < 25)
+        // - Full width
+        // - White background
+        if (f.origin.y < 3 && 
+            f.size.height < 25 && 
+            f.size.width >= self.view.bounds.size.width) {
+            
+            CGFloat brightness = 0;
+            if ([subview.backgroundColor getWhite:&brightness alpha:NULL] && brightness > 0.98) {
+                NSLog(@"Found suspicious white bar to remove: %@ (frame %@)", subview, NSStringFromCGRect(f));
+                [viewsToRemove addObject:subview];
+            }
+        }
+    }
+    
+    // Remove the identified views
+    for (UIView *view in viewsToRemove) {
+        [view removeFromSuperview];
+        NSLog(@"Removed white bar view");
+    }
+    */
 }
 
 -(void)dealloc{
@@ -1158,3 +1216,4 @@ SKControllerBounds SKControllerBoundsMake(CGFloat minX,CGFloat maxX){
 
 
 @end
+

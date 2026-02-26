@@ -578,12 +578,19 @@
         [UIView commitAnimations];
     }
     if (indexOfTab == 5) {
-        [UserModel setUserID:0];
-        [UserModel setUserHD:-1];
-        [self.statusTimer invalidate];
-        self.statusTimer = nil;
-        [UserModel setUserID:0];
-        [self dismissViewControllerAnimated:YES completion:nil];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Confirm Sign Out" message:@"Are you sure you want to sign-out?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Yes",@"No", nil];
+        [UtilityModel showAlertView:alert withCallback:^(NSInteger buttonIndex) {
+            if (buttonIndex == 0) {
+                // User confirmed sign out
+                [UserModel setUserID:0];
+                [UserModel setUserHD:-1];
+                [self.statusTimer invalidate];
+                self.statusTimer = nil;
+                [UserModel setUserID:0];
+                [self dismissViewControllerAnimated:YES completion:nil];
+            }
+            // If buttonIndex == 1, user selected "No" - do nothing
+        }];
     }
     //NSLog(@"Tab index = %lu", (unsigned long)indexOfTab);
 }

@@ -30,8 +30,12 @@
 @property (weak, nonatomic) IBOutlet UITabBar *tabBar;
 @property (weak, nonatomic) IBOutlet UIView *viewAbout;
 @property (weak, nonatomic) IBOutlet UIWebView *webHome;
+@property (nonatomic, strong) UIButton *btnInfo;
+@property (nonatomic, strong) UIButton *btnContact;
 - (IBAction)btnWebClose:(id)sender;
 - (IBAction)btnLogin:(id)sender;
+- (void)btnInfoTapped:(id)sender;
+- (void)btnContactTapped:(id)sender;
 
 #define kOFFSET_FOR_KEYBOARD 80.0
 //#define CGRectSetPos( r, x, y ) CGRectMake( x, y, r.size.width, r.size.height )
@@ -72,8 +76,8 @@
     [self.view addSubview:_spinner];
     
     //text box placeholder color
-    UIColor *color = [UIColor lightTextColor];
-    _txtEmail.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"E-Mail" attributes:@{NSForegroundColorAttributeName: color}];
+    UIColor *color = [UIColor colorWithWhite:0.7 alpha:1.0]; // Light gray color for visibility on white background
+    _txtEmail.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"E-mail Address" attributes:@{NSForegroundColorAttributeName: color}];
     _txtPassword.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"Password" attributes:@{NSForegroundColorAttributeName: color}];
     
     //text box left padding
@@ -118,10 +122,70 @@
         [self performSegueWithIdentifier:@"segue1" sender:nil];
     } else {
         [UserModel setUserHD:-1];
+        
+        // Create Info and Contact buttons BEFORE showing the modal (so they're behind it)
+        CGFloat screenWidth = self.view.frame.size.width;
+        CGFloat buttonWidth = 50.0;
+        CGFloat buttonHeight = 50.0;
+        CGFloat spacing = 50.0; // 10px closer (was 60)
+        CGFloat bottomMargin = 25.0; // 15px lower (was 40)
+        CGFloat centerX = screenWidth / 2.0;
+        CGFloat buttonY = self.view.frame.size.height - bottomMargin - buttonHeight;
+        
+        // Info button
+        _btnInfo = [UIButton buttonWithType:UIButtonTypeCustom];
+        _btnInfo.frame = CGRectMake(centerX - buttonWidth - spacing/2, buttonY, buttonWidth, buttonHeight);
+        
+        // Try to set image, fallback to text label
+        UIImage *infoImage = [UIImage imageNamed:@"icon_info"];
+        if (infoImage) {
+            [_btnInfo setImage:infoImage forState:UIControlStateNormal];
+        } else {
+            // Fallback: use a label with "i" for info
+            _btnInfo.backgroundColor = [UIColor colorWithWhite:0.3 alpha:0.7];
+            _btnInfo.layer.cornerRadius = buttonWidth / 2.0;
+            [_btnInfo setTitle:@"i" forState:UIControlStateNormal];
+            [_btnInfo setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            _btnInfo.titleLabel.font = [UIFont boldSystemFontOfSize:24];
+        }
+        
+        [_btnInfo addTarget:self action:@selector(btnInfoTapped:) forControlEvents:UIControlEventTouchUpInside];
+        _btnInfo.accessibilityLabel = @"Info";
+        
+        // Contact button
+        _btnContact = [UIButton buttonWithType:UIButtonTypeCustom];
+        _btnContact.frame = CGRectMake(centerX + spacing/2, buttonY, buttonWidth, buttonHeight);
+        
+        // Try to set image, fallback to text label
+        UIImage *contactImage = [UIImage imageNamed:@"icon_contact"];
+        if (contactImage) {
+            [_btnContact setImage:contactImage forState:UIControlStateNormal];
+        } else {
+            // Fallback: use a label with envelope symbol
+            _btnContact.backgroundColor = [UIColor colorWithWhite:0.3 alpha:0.7];
+            _btnContact.layer.cornerRadius = buttonWidth / 2.0;
+            [_btnContact setTitle:@"✉" forState:UIControlStateNormal];
+            [_btnContact setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+            _btnContact.titleLabel.font = [UIFont systemFontOfSize:24];
+        }
+        
+        [_btnContact addTarget:self action:@selector(btnContactTapped:) forControlEvents:UIControlEventTouchUpInside];
+        _btnContact.accessibilityLabel = @"Contact";
+        
+        // Add buttons to the view BEFORE the modal
+        [self.view addSubview:_btnInfo];
+        [self.view addSubview:_btnContact];
+        
+        NSLog(@"Buttons created at y: %f", buttonY);
+        
+        // NOW show the release notes modal (will appear on top of buttons)
         TWSReleaseNotesView *releaseNotesView = [TWSReleaseNotesView viewWithReleaseNotesTitle:@"ADVISORY" text:@"VJ-Pro is a music video resource for non-broadcast DJ/VJ's and other music driven video content professionals for use in closed-circuit, public performance displays ONLY. The services and resources on the VJ-Pro web site and app are made available under current and specific licenses and permissions granted by the original copyright holders and/or their consigns under usage and display definitions in accordance with United States Copyright Code, Title 17; §106(4,5) and §114(b) respectively, and for use in ASCAP, BMI and SESAC compliant venues within the United States and its territories alone.\n\nThe VJ-Pro mobile app and web site are NOT consumer resources for musical and/or video works and the assets described herein are NOT made available to the general public under any circumstance or condition.  By pressing the \"I AGREE\" button below and proceeding, you warrant and represent without condition or reservation, that you are a media professional as per the definitions above and seek access to this mobile app strictly within such capacity.\n\nIf you DO NOT meet these requirements or you DO NOT AGREE, please exit and delete this app." closeButtonTitle:@"I AGREE"];
         // Show the release notes view
         [releaseNotesView showInView:self.view];
     }
+    
+    // Hide the tab bar (removes Facebook and Twitter)
+    _tabBar.hidden = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -389,4 +453,43 @@
         [_spinner stopAnimating];
     //}
 }
+
+- (void)btnInfoTapped:(id)sender {
+    [_webHome stringByEvaluatingJavaScriptFromString:@"document.body.innerHTML = \"\";"];
+    
+    NSURL *myUrl = [NSURL URLWithString:@"https://www.vj-pro.net/Mobile/Info"];
+    NSURLRequest *myRequest = [NSURLRequest requestWithURL:myUrl];
+    
+    _viewAbout.hidden = NO;
+    [_ovcontroller showOverlay];
+    [_spinner startAnimating];
+    [_viewAbout setAlpha:0];
+    
+    [_webHome loadRequest:myRequest];
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:1.0];
+    [_viewAbout setAlpha:1.0];
+    [UIView commitAnimations];
+}
+
+- (void)btnContactTapped:(id)sender {
+    [_webHome stringByEvaluatingJavaScriptFromString:@"document.body.innerHTML = \"\";"];
+    
+    NSURL *myUrl = [NSURL URLWithString:@"https://www.vj-pro.net/Mobile/Contact"];
+    NSURLRequest *myRequest = [NSURLRequest requestWithURL:myUrl];
+    
+    _viewAbout.hidden = NO;
+    [_ovcontroller showOverlay];
+    [_spinner startAnimating];
+    [_viewAbout setAlpha:0];
+    
+    [_webHome loadRequest:myRequest];
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationDuration:1.0];
+    [_viewAbout setAlpha:1.0];
+    [UIView commitAnimations];
+}
+
 @end

@@ -34,8 +34,6 @@
 		DB57A1801862CD8D00B011B1 /* 72.png in Resources */ = {isa = PBXBuildFile; fileRef = DB57A1701862CD8D00B011B1 /* 72.png */; };
 		DB57A1811862CD8D00B011B1 /* 76.png in Resources */ = {isa = PBXBuildFile; fileRef = DB57A1711862CD8D00B011B1 /* 76.png */; };
 		DB57A1821862CD8D00B011B1 /* 80.png in Resources */ = {isa = PBXBuildFile; fileRef = DB57A1721862CD8D00B011B1 /* 80.png */; };
-		DB57A1831862CD8D00B011B1 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DB57A1741862CD8D00B011B1 /* Default-568h@2x.png */; };
-		DB57A1841862CD8D00B011B1 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DB57A1751862CD8D00B011B1 /* Default@2x.png */; };
 		DB57A18F1862E7F800B011B1 /* tab_download.png in Resources */ = {isa = PBXBuildFile; fileRef = DB57A1851862E7F800B011B1 /* tab_download.png */; };
 		DB57A1901862E7F800B011B1 /* tab_download@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DB57A1861862E7F800B011B1 /* tab_download@2x.png */; };
 		DB57A1911862E7F800B011B1 /* tab_logout.png in Resources */ = {isa = PBXBuildFile; fileRef = DB57A1871862E7F800B011B1 /* tab_logout.png */; };
@@ -75,6 +73,8 @@
 		DB58A1EC183CECDF00621EED /* dropdown-alert.png in Resources */ = {isa = PBXBuildFile; fileRef = DB58A1DC183CECDF00621EED /* dropdown-alert.png */; };
 		DB58A1ED183CECDF00621EED /* dropdown-alert@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = DB58A1DD183CECDF00621EED /* dropdown-alert@2x.png */; };
 		DB58A1EE183CECDF00621EED /* YRDropdownView.m in Sources */ = {isa = PBXBuildFile; fileRef = DB58A1DF183CECDF00621EED /* YRDropdownView.m */; };
+		DB7BA4142F50586E00B5BB9C /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB7BA4132F50586E00B5BB9C /* Launch Screen.storyboard */; };
+		DB7BA4162F5058DF00B5BB9C /* splash.png in Resources */ = {isa = PBXBuildFile; fileRef = DB7BA4152F5058DF00B5BB9C /* splash.png */; };
 		DB7BE8A91854C3C4007F5832 /* PreviewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB7BE8A81854C3C4007F5832 /* PreviewController.m */; };
 		DB84D5D8185EE05D0076BAEB /* icon_pause.png in Resources */ = {isa = PBXBuildFile; fileRef = DB84D5D6185EE05D0076BAEB /* icon_pause.png */; };
 		DB84D5D9185EE05D0076BAEB /* icon_play.png in Resources */ = {isa = PBXBuildFile; fileRef = DB84D5D7185EE05D0076BAEB /* icon_play.png */; };
@@ -169,8 +169,6 @@
 		DB57A1701862CD8D00B011B1 /* 72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 72.png; sourceTree = "<group>"; };
 		DB57A1711862CD8D00B011B1 /* 76.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 76.png; sourceTree = "<group>"; };
 		DB57A1721862CD8D00B011B1 /* 80.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 80.png; sourceTree = "<group>"; };
-		DB57A1741862CD8D00B011B1 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		DB57A1751862CD8D00B011B1 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		DB57A1851862E7F800B011B1 /* tab_download.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tab_download.png; sourceTree = "<group>"; };
 		DB57A1861862E7F800B011B1 /* tab_download@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tab_download@2x.png"; sourceTree = "<group>"; };
 		DB57A1871862E7F800B011B1 /* tab_logout.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tab_logout.png; sourceTree = "<group>"; };
@@ -225,6 +223,8 @@
 		DB58A1DD183CECDF00621EED /* dropdown-alert@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dropdown-alert@2x.png"; sourceTree = "<group>"; };
 		DB58A1DE183CECDF00621EED /* YRDropdownView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRDropdownView.h; sourceTree = "<group>"; };
 		DB58A1DF183CECDF00621EED /* YRDropdownView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRDropdownView.m; sourceTree = "<group>"; };
+		DB7BA4132F50586E00B5BB9C /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		DB7BA4152F5058DF00B5BB9C /* splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splash.png; sourceTree = "<group>"; };
 		DB7BE8A71854C3C4007F5832 /* PreviewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreviewController.h; sourceTree = "<group>"; };
 		DB7BE8A81854C3C4007F5832 /* PreviewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreviewController.m; sourceTree = "<group>"; };
 		DB84D5D6185EE05D0076BAEB /* icon_pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_pause.png; sourceTree = "<group>"; };
@@ -357,8 +357,6 @@
 		DB57A1731862CD8D00B011B1 /* launch */ = {
 			isa = PBXGroup;
 			children = (
-				DB57A1741862CD8D00B011B1 /* Default-568h@2x.png */,
-				DB57A1751862CD8D00B011B1 /* Default@2x.png */,
 			);
 			path = launch;
 			sourceTree = "<group>";
@@ -366,6 +364,7 @@
 		DB58A17B183CEBAE00621EED = {
 			isa = PBXGroup;
 			children = (
+				DB7BA4132F50586E00B5BB9C /* Launch Screen.storyboard */,
 				DB58A1C1183CEC1F00621EED /* models */,
 				DB58A1C0183CEC1700621EED /* views */,
 				DB58A1BF183CEC0900621EED /* controllers */,
@@ -664,6 +663,7 @@
 				DBE09750186C4A9800F1BB7E /* tab_twitter.png */,
 				DBE09751186C4A9800F1BB7E /* tab_twitter@2x.png */,
 				DB1BA260185843B500340949 /* player_background.png */,
+				DB7BA4152F5058DF00B5BB9C /* splash.png */,
 			);
 			name = images;
 			path = vjpro/images;
@@ -736,6 +736,7 @@
 				TargetAttributes = {
 					DB58A183183CEBAE00621EED = {
 						DevelopmentTeam = 599267FNH5;
+						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -792,7 +793,6 @@
 				DBE0974C186C499100F1BB7E /* tab_facebook.png in Resources */,
 				DB58A19E183CEBAF00621EED /* Main_iPad.storyboard in Resources */,
 				DB57A1901862E7F800B011B1 /* tab_download@2x.png in Resources */,
-				DB57A1831862CD8D00B011B1 /* Default-568h@2x.png in Resources */,
 				DB58A1EA183CECDF00621EED /* bg-yellow.png in Resources */,
 				DB0AD6B618635DBC00E00716 /* icon_hd_big.png in Resources */,
 				DB57A17D1862CD8D00B011B1 /* 50.png in Resources */,
@@ -808,8 +808,8 @@
 				DB1BA25B1858436700340949 /* arrow.png in Resources */,
 				DBA85C1E186E779300D1CEDF /* segmented-bg.png in Resources */,
 				DB84D5D8185EE05D0076BAEB /* icon_pause.png in Resources */,
+				DB7BA4142F50586E00B5BB9C /* Launch Screen.storyboard in Resources */,
 				DB57A17F1862CD8D00B011B1 /* 58.png in Resources */,
-				DB57A1841862CD8D00B011B1 /* Default@2x.png in Resources */,
 				DBEF4B78186AB43300665618 /* dot_red.png in Resources */,
 				DB32599D19BDCEDA00B8662E /* icon_qhd_big.png in Resources */,
 				DB57A1821862CD8D00B011B1 /* 80.png in Resources */,
@@ -822,6 +822,7 @@
 				DB58A1EB183CECDF00621EED /* bg-yellow@2x.png in Resources */,
 				DB57A1781862CD8D00B011B1 /* 120.png in Resources */,
 				DB57A17B1862CD8D00B011B1 /* 29.png in Resources */,
+				DB7BA4162F5058DF00B5BB9C /* splash.png in Resources */,
 				DB57A1951862E7F800B011B1 /* tab_refresh.png in Resources */,
 				DB57A1961862E7F800B011B1 /* tab_refresh@2x.png in Resources */,
 				DB58A1ED183CECDF00621EED /* dropdown-alert@2x.png in Resources */,
@@ -1039,9 +1040,10 @@
 		DB58A1BA183CEBAF00621EED /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2000;
+				DEVELOPMENT_TEAM = 599267FNH5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vjpro/vjpro-Prefix.pch";
 				INFOPLIST_FILE = "vjpro/vjpro-Info.plist";
@@ -1051,6 +1053,7 @@
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_NAME = "VJ-Pro";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1059,9 +1062,10 @@
 		DB58A1BB183CEBAF00621EED /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution: johnny ARGUELLES (599267FNH5)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: johnny ARGUELLES (599267FNH5)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2000;
+				DEVELOPMENT_TEAM = 599267FNH5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vjpro/vjpro-Prefix.pch";
 				INFOPLIST_FILE = "vjpro/vjpro-Info.plist";
@@ -1071,6 +1075,7 @@
 				MARKETING_VERSION = 2.0.0;
 				PRODUCT_NAME = "VJ-Pro";
 				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

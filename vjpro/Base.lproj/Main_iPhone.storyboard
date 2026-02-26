@@ -70,21 +70,6 @@
                                 </subviews>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
-                            <tabBar contentMode="scaleToFill" fixedFrame="YES" barStyle="black" translatesAutoresizingMaskIntoConstraints="NO" id="HYb-CQ-QBc">
-                                <rect key="frame" x="0.0" y="803" width="393" height="49"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                <items>
-                                    <tabBarItem title="Info" image="tab_info.png" id="Ad0-tP-WRl"/>
-                                    <tabBarItem title="Facebook" image="tab_facebook.png" id="hJQ-wq-Gov"/>
-                                    <tabBarItem title="Twitter" image="tab_twitter.png" id="52q-e6-RKQ"/>
-                                    <tabBarItem title="Contact" image="tab_contact.png" id="DNN-1Q-BKm"/>
-                                </items>
-                                <color key="selectedImageTintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <connections>
-                                    <outlet property="delegate" destination="vXZ-lx-hvc" id="bul-3U-jwA"/>
-                                </connections>
-                            </tabBar>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t13-ba-shX">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="519"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -135,7 +120,6 @@
                     </view>
                     <navigationItem key="navigationItem" id="svo-vX-6RS"/>
                     <connections>
-                        <outlet property="tabBar" destination="HYb-CQ-QBc" id="tXj-Ld-ZRV"/>
                         <outlet property="txtEmail" destination="3QE-mI-fqX" id="G23-JA-C3g"/>
                         <outlet property="txtPassword" destination="3ex-sg-9vN" id="LYD-i8-RjL"/>
                         <outlet property="viewAbout" destination="t13-ba-shX" id="Kb4-8H-Hid"/>
@@ -809,16 +793,12 @@
         <image name="nav_back.png" width="20" height="20"/>
         <image name="nav_forward.png" width="20" height="20"/>
         <image name="player_background.png" width="540" height="304"/>
-        <image name="tab_contact.png" width="45" height="45"/>
         <image name="tab_download.png" width="45" height="45"/>
-        <image name="tab_facebook.png" width="45" height="45"/>
-        <image name="tab_info.png" width="45" height="45"/>
         <image name="tab_logout.png" width="45" height="45"/>
         <image name="tab_purchase.png" width="45" height="45"/>
         <image name="tab_queue.png" width="45" height="45"/>
         <image name="tab_refresh.png" width="45" height="45"/>
         <image name="tab_sort.png" width="45" height="45"/>
-        <image name="tab_twitter.png" width="45" height="45"/>
         <systemColor name="darkTextColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

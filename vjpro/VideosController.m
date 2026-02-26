@@ -26,7 +26,6 @@
 
 @interface VideosController ()
 
-@property (nonatomic, weak) SKSlideViewController *slideController;
 @property (nonatomic, retain) SpinnerController *spinner;
 @property (nonatomic, retain) OverlayViewController *ovcontroller;
 - (IBAction)btnQueue:(id)sender;
@@ -78,6 +77,47 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    
+    // Configure tab bar items here to ensure they're fully initialized
+    if (_tabBar && _tabBar.items.count > 0) {
+        NSArray *titles = @[@"Sort", @"List", @"Show All", @"Queue", @"Downloads", @"Purchase", @"Log Out"];
+        int index = 0;
+        
+        for (UITabBarItem *item in _tabBar.items) {
+            // Store original title for accessibility
+            if (index < titles.count) {
+                item.accessibilityLabel = titles[index];
+            }
+            
+            // Completely remove the title text
+            item.title = nil;
+            
+            // Move title way off screen as backup
+            [item setTitlePositionAdjustment:UIOffsetMake(0.0, 100.0)];
+            
+            // Set title attributes to make text invisible
+            NSDictionary *attributes = @{
+                NSFontAttributeName: [UIFont systemFontOfSize:0.1],
+                NSForegroundColorAttributeName: [UIColor clearColor]
+            };
+            [item setTitleTextAttributes:attributes forState:UIControlStateNormal];
+            [item setTitleTextAttributes:attributes forState:UIControlStateSelected];
+            
+            // Center the icons vertically
+            item.imageInsets = UIEdgeInsetsMake(6.0, 0.0, -6.0, 0.0);
+            
+            // Force images to render as template images with fixed tint color
+            if (item.image) {
+                item.image = [item.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            }
+            if (item.selectedImage) {
+                item.selectedImage = [item.selectedImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            }
+            
+            index++;
+        }
+    }
+    
     [self performSelector:@selector(hidespinner) withObject:self afterDelay:2.5];
 }
 
@@ -159,24 +199,84 @@
                                         repeats:YES];
     NSLog(@"loop started");
     
-    // Customize tab bar spacing: reduce vertical space under icons and increase perceived horizontal spacing
-    // Tab bar layout: show full labels and clearly reduce the gap between icon and label
-    if (_tabBar && _tabBar.items.count > 0) {
-        for (UITabBarItem *item in _tabBar.items) {
-            // Reset image insets so the image is centered
-            item.imageInsets = UIEdgeInsetsZero;
-
-            // Strongly reduce the space between the icon and the label by moving the title up
-            // Try -5.0 or -6.0 for a more obvious change
-            [item setTitlePositionAdjustment:UIOffsetMake(0.0, -5.0)];
-        }
-    }
-
     if (_tabBar) {
-        _tabBar.backgroundImage = [UIImage new];
-        _tabBar.shadowImage = [UIImage new];
-        _tabBar.backgroundColor = [UIColor clearColor];
-        _tabBar.translucent = YES;
+        // Create a solid color image for the background to prevent any adaptation
+        CGSize backgroundSize = CGSizeMake(1, 1);
+        UIColor *backgroundColor = [UIColor colorWithWhite:0.95 alpha:1.0];
+        
+        UIGraphicsBeginImageContextWithOptions(backgroundSize, NO, 0.0);
+        [backgroundColor setFill];
+        UIRectFill(CGRectMake(0, 0, backgroundSize.width, backgroundSize.height));
+        UIImage *backgroundImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        // Use UITabBarAppearance for iOS 13+ to have full control
+        if (@available(iOS 13.0, *)) {
+            UITabBarAppearance *appearance = [[UITabBarAppearance alloc] init];
+            
+            // Use opaque configuration to prevent adaptive behavior
+            [appearance configureWithOpaqueBackground];
+            appearance.backgroundColor = backgroundColor;
+            appearance.backgroundImage = backgroundImage;
+            
+            // Completely disable shadow
+            appearance.shadowColor = nil;
+            appearance.shadowImage = nil;
+            
+            // Set normal icon colors - black for all states and all layouts
+            UIColor *iconColor = [UIColor blackColor];
+            UIColor *selectedYellow = [UIColor yellowColor];
+            
+            appearance.stackedLayoutAppearance.normal.iconColor = iconColor;
+            // Override selected icon color (no backgroundEffect or backgroundColor)
+            appearance.stackedLayoutAppearance.selected.iconColor = selectedYellow;
+            
+            appearance.stackedLayoutAppearance.focused.iconColor = iconColor;
+            appearance.stackedLayoutAppearance.disabled.iconColor = [UIColor grayColor];
+            
+            appearance.inlineLayoutAppearance.normal.iconColor = iconColor;
+            // Override selected icon color (no backgroundColor)
+            appearance.inlineLayoutAppearance.selected.iconColor = selectedYellow;
+            
+            appearance.inlineLayoutAppearance.focused.iconColor = iconColor;
+            appearance.inlineLayoutAppearance.disabled.iconColor = [UIColor grayColor];
+            
+            appearance.compactInlineLayoutAppearance.normal.iconColor = iconColor;
+            // Override selected icon color (no backgroundColor)
+            appearance.compactInlineLayoutAppearance.selected.iconColor = selectedYellow;
+            
+            appearance.compactInlineLayoutAppearance.focused.iconColor = iconColor;
+            appearance.compactInlineLayoutAppearance.disabled.iconColor = [UIColor grayColor];
+            
+            // Apply the same appearance to ALL appearance properties
+            _tabBar.standardAppearance = appearance;
+            _tabBar.scrollEdgeAppearance = appearance;
+            
+            // iOS 15+ requires compactAppearance and compactScrollEdgeAppearance
+            if (@available(iOS 15.0, *)) {
+                _tabBar.scrollEdgeAppearance = appearance;
+            }
+            
+            // Force light interface style
+            _tabBar.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+        } else {
+            // Fallback for iOS 12 and earlier
+            _tabBar.backgroundImage = backgroundImage;
+            _tabBar.shadowImage = [[UIImage alloc] init];
+            _tabBar.barTintColor = backgroundColor;
+        }
+        
+        // Set tint colors AFTER setting appearance (works for both iOS versions)
+        _tabBar.tintColor = [UIColor yellowColor]; // Selected items
+        _tabBar.unselectedItemTintColor = [UIColor blackColor]; // Unselected items
+        
+        // Make opaque (not translucent) to prevent background from affecting appearance
+        _tabBar.translucent = NO;
+        _tabBar.opaque = YES;
+        _tabBar.barStyle = UIBarStyleDefault; // Force default (light) bar style
+        
+        // Force the layer to be opaque as well
+        _tabBar.layer.opaque = YES;
     }
     
     //load data
@@ -677,4 +777,6 @@
 }
 
 @end
+
+
 

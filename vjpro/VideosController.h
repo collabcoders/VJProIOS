@@ -23,6 +23,7 @@
 @property (nonatomic) BOOL connectionWasDropped;
 @property (nonatomic, retain) NSTimer *statusTimer;
 @property (weak, nonatomic) IBOutlet UITableView *tblVideos;
+@property (nonatomic, weak) SKSlideViewController *slideController;
 
 - (IBAction)didTappedRevealLeftButton:(id)sender;
 

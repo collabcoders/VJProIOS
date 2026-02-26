@@ -388,16 +388,29 @@
                             <tabBar contentMode="scaleToFill" fixedFrame="YES" barStyle="black" translatesAutoresizingMaskIntoConstraints="NO" id="ycN-QD-7pe">
                                 <rect key="frame" x="-17" y="731" width="427" height="48"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <items>
-                                    <tabBarItem title="Sort List" image="tab_sort.png" id="ZuU-fl-3jW"/>
-                                    <tabBarItem title="Show All" image="tab_refresh.png" id="xTK-dc-Ssf"/>
-                                    <tabBarItem title="Queue" image="tab_queue.png" id="IBP-J3-389"/>
-                                    <tabBarItem title="Downloads" image="tab_download.png" id="Zlo-I1-l3G"/>
-                                    <tabBarItem title="Purchase" image="tab_purchase.png" id="DN7-nD-HGx"/>
-                                    <tabBarItem title="Log Out" image="tab_logout.png" id="lgN-jD-PsI"/>
+                                    <tabBarItem title="Sort List" image="tab_sort.png" id="ZuU-fl-3jW">
+                                        <color key="badgeColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tabBarItem>
+                                    <tabBarItem title="Show All" image="tab_refresh.png" id="xTK-dc-Ssf">
+                                        <color key="badgeColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tabBarItem>
+                                    <tabBarItem title="Queue" image="tab_queue.png" id="IBP-J3-389">
+                                        <color key="badgeColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tabBarItem>
+                                    <tabBarItem title="Downloads" image="tab_download.png" id="Zlo-I1-l3G">
+                                        <color key="badgeColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tabBarItem>
+                                    <tabBarItem title="Purchase" image="tab_purchase.png" id="DN7-nD-HGx">
+                                        <color key="badgeColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tabBarItem>
+                                    <tabBarItem title="Log Out" image="tab_logout.png" id="lgN-jD-PsI">
+                                        <color key="badgeColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tabBarItem>
                                 </items>
-                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="barTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <color key="selectedImageTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <connections>
                                     <outlet property="delegate" destination="VeY-9x-Exa" id="2Fn-A9-2Pp"/>

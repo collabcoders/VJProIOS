@@ -7,12 +7,18 @@
 //
 
 #import "AppDelegate.h"
+#import "LaunchViewController.h"
 
 @implementation AppDelegate
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // Add custom launch screen overlay FIRST (before anything else)
+    LaunchViewController *launchVC = [[LaunchViewController alloc] init];
+    [self.window addSubview:launchVC.view];
+    launchVC.view.frame = self.window.bounds;
+    
     // Set global tab bar item title font (normal state)
     [[UITabBarItem appearance] setTitleTextAttributes:@{
         NSFontAttributeName: [UIFont systemFontOfSize:10.0]

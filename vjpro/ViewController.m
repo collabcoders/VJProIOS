@@ -80,6 +80,14 @@
     _txtEmail.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"E-mail Address" attributes:@{NSForegroundColorAttributeName: color}];
     _txtPassword.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"Password" attributes:@{NSForegroundColorAttributeName: color}];
     
+    // Reinforce placeholder colors
+    if (_txtEmail.placeholder.length > 0) {
+        _txtEmail.attributedPlaceholder = [[NSAttributedString alloc] initWithString:_txtEmail.placeholder attributes:@{NSForegroundColorAttributeName: color}];
+    }
+    if (_txtPassword.placeholder.length > 0) {
+        _txtPassword.attributedPlaceholder = [[NSAttributedString alloc] initWithString:_txtPassword.placeholder attributes:@{NSForegroundColorAttributeName: color}];
+    }
+    
     //text box left padding
     _txtEmail.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 12, 20)];
     _txtEmail.leftViewMode = UITextFieldViewModeAlways;
@@ -87,6 +95,12 @@
     _txtPassword.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 12, 20)];
     _txtPassword.leftViewMode = UITextFieldViewModeAlways;
     _txtPassword.backgroundColor = [UIColor whiteColor];
+    
+    // Ensure login text fields are always readable
+    _txtEmail.textColor = [UIColor blackColor];
+    _txtPassword.textColor = [UIColor blackColor];
+    _txtEmail.keyboardAppearance = UIKeyboardAppearanceLight;
+    _txtPassword.keyboardAppearance = UIKeyboardAppearanceLight;
     
     myFrame = _viewLogin.frame;
     int bgmargin = 0;
@@ -505,4 +519,14 @@
     [UIView commitAnimations];
 }
 
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    // Keep login fields readable across appearances
+    _txtEmail.textColor = [UIColor blackColor];
+    _txtPassword.textColor = [UIColor blackColor];
+    _txtEmail.backgroundColor = [UIColor whiteColor];
+    _txtPassword.backgroundColor = [UIColor whiteColor];
+}
+
 @end
+

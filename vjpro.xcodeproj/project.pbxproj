@@ -382,8 +382,6 @@
 		DB57A1731862CD8D00B011B1 /* launch */ = {
 			isa = PBXGroup;
 			children = (
-<<<<<<< HEAD
-=======
 				DB1ED90B2F5361B100F443B9 /* Default-568h@2x.png */,
 				DB1ED90C2F5361B100F443B9 /* Default-667h@2x.png */,
 				DB1ED90D2F5361B100F443B9 /* Default-736h@3x.png */,
@@ -395,7 +393,6 @@
 				DB1ED9132F5361B100F443B9 /* Default-926h@3x.png */,
 				DB1ED9142F5361B100F443B9 /* Default-932h@3x.png */,
 				DB1ED9152F5361B100F443B9 /* Default@2x.png */,
->>>>>>> stage
 			);
 			path = launch;
 			sourceTree = "<group>";

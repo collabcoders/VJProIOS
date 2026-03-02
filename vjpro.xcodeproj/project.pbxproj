@@ -66,7 +66,6 @@
 		DB58A19B183CEBAF00621EED /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB58A199183CEBAF00621EED /* Main_iPhone.storyboard */; };
 		DB58A19E183CEBAF00621EED /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DB58A19C183CEBAF00621EED /* Main_iPad.storyboard */; };
 		DB58A1A1183CEBAF00621EED /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB58A1A0183CEBAF00621EED /* ViewController.m */; };
-		DB58A1A3183CEBAF00621EED /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DB58A1A2183CEBAF00621EED /* Images.xcassets */; };
 		DB58A1AA183CEBAF00621EED /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB58A1A9183CEBAF00621EED /* XCTest.framework */; };
 		DB58A1AB183CEBAF00621EED /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB58A187183CEBAE00621EED /* Foundation.framework */; };
 		DB58A1AC183CEBAF00621EED /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB58A18B183CEBAE00621EED /* UIKit.framework */; };
@@ -130,6 +129,7 @@
 		DBEF4B78186AB43300665618 /* dot_red.png in Resources */ = {isa = PBXBuildFile; fileRef = DBEF4B75186AB43300665618 /* dot_red.png */; };
 		DBEF4B79186AB43300665618 /* dot_yellow.png in Resources */ = {isa = PBXBuildFile; fileRef = DBEF4B76186AB43300665618 /* dot_yellow.png */; };
 		DBEF59C3185672B600400027 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBEF59C2185672B600400027 /* MediaPlayer.framework */; };
+		DBF8A5392F550CE50007F179 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DBF8A5382F550CE50007F179 /* Assets.xcassets */; };
 		DBF95F1C185990FA00A71C00 /* icon_1080.png in Resources */ = {isa = PBXBuildFile; fileRef = DBF95F1A185990FA00A71C00 /* icon_1080.png */; };
 		DBF95F1D185990FA00A71C00 /* icon_hd.png in Resources */ = {isa = PBXBuildFile; fileRef = DBF95F1B185990FA00A71C00 /* icon_hd.png */; };
 		DBF95F1F185992DE00A71C00 /* background_login.png in Resources */ = {isa = PBXBuildFile; fileRef = DBF95F1E185992DE00A71C00 /* background_login.png */; };
@@ -219,7 +219,6 @@
 		DB58A19D183CEBAF00621EED /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
 		DB58A19F183CEBAF00621EED /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		DB58A1A0183CEBAF00621EED /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
-		DB58A1A2183CEBAF00621EED /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		DB58A1A8183CEBAF00621EED /* vjproTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = vjproTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB58A1A9183CEBAF00621EED /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		DB58A1B1183CEBAF00621EED /* vjproTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "vjproTests-Info.plist"; sourceTree = "<group>"; };
@@ -305,6 +304,8 @@
 		DBEF4B75186AB43300665618 /* dot_red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dot_red.png; sourceTree = "<group>"; };
 		DBEF4B76186AB43300665618 /* dot_yellow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dot_yellow.png; sourceTree = "<group>"; };
 		DBEF59C2185672B600400027 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		DBF8A5382F550CE50007F179 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DBF8A53A2F5514EF0007F179 /* vjpro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = vjpro.entitlements; sourceTree = "<group>"; };
 		DBF95F1A185990FA00A71C00 /* icon_1080.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_1080.png; sourceTree = "<group>"; };
 		DBF95F1B185990FA00A71C00 /* icon_hd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon_hd.png; sourceTree = "<group>"; };
 		DBF95F1E185992DE00A71C00 /* background_login.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background_login.png; sourceTree = "<group>"; };
@@ -439,13 +440,14 @@
 		DB58A18D183CEBAE00621EED /* vjpro */ = {
 			isa = PBXGroup;
 			children = (
+				DBF8A53A2F5514EF0007F179 /* vjpro.entitlements */,
 				DB3901C919AA9D7300D2AA1C /* VJ-Pro.entitlements */,
 				DB58A196183CEBAF00621EED /* AppDelegate.h */,
 				DB58A197183CEBAF00621EED /* AppDelegate.m */,
-				DB58A1A2183CEBAF00621EED /* Images.xcassets */,
 				DB57A1651862CD8D00B011B1 /* icons */,
 				DB57A1731862CD8D00B011B1 /* launch */,
 				DB58A18E183CEBAE00621EED /* Supporting Files */,
+				DBF8A5382F550CE50007F179 /* Assets.xcassets */,
 			);
 			path = vjpro;
 			sourceTree = "<group>";
@@ -863,6 +865,7 @@
 				DB32599D19BDCEDA00B8662E /* icon_qhd_big.png in Resources */,
 				DB57A1821862CD8D00B011B1 /* 80.png in Resources */,
 				DB9225E2187553E100E074B8 /* tab_purchase@2x.png in Resources */,
+				DBF8A5392F550CE50007F179 /* Assets.xcassets in Resources */,
 				DB1BA261185843B500340949 /* icon_queue_add.png in Resources */,
 				DBE0974A186C499100F1BB7E /* tab_contact.png in Resources */,
 				DBEF4B77186AB43300665618 /* dot_green.png in Resources */,
@@ -888,7 +891,6 @@
 				DBE0974D186C499100F1BB7E /* tab_facebook@2x.png in Resources */,
 				DBDA21D7185446E1006C6E6C /* icon_preview.png in Resources */,
 				DB1BA263185843B500340949 /* icon_queue_remove.png in Resources */,
-				DB58A1A3183CEBAF00621EED /* Images.xcassets in Resources */,
 				DB57A1761862CD8D00B011B1 /* 100.png in Resources */,
 				DBE09748186C499100F1BB7E /* nav_forward.png in Resources */,
 				DB58A1EC183CECDF00621EED /* dropdown-alert.png in Resources */,
@@ -1090,9 +1092,12 @@
 		DB58A1BA183CEBAF00621EED /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=*]" = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = vjpro/vjpro.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2000;
+				CURRENT_PROJECT_VERSION = 2510;
 				DEVELOPMENT_TEAM = 599267FNH5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vjpro/vjpro-Prefix.pch";
@@ -1100,7 +1105,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "VJ-Pro";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.5.1;
 				PRODUCT_NAME = "VJ-Pro";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1112,9 +1117,12 @@
 		DB58A1BB183CEBAF00621EED /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "";
+				"ASSETCATALOG_COMPILER_APPICON_NAME[sdk=*]" = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = vjpro/vjpro.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2000;
+				CURRENT_PROJECT_VERSION = 2510;
 				DEVELOPMENT_TEAM = 599267FNH5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "vjpro/vjpro-Prefix.pch";
@@ -1122,7 +1130,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "VJ-Pro";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.5.1;
 				PRODUCT_NAME = "VJ-Pro";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";

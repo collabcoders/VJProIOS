@@ -44,6 +44,7 @@
 
 @property (nonatomic, retain) NSTimer *vidTimer;
 //@property (nonatomic, retain) NSTimer *bufferTimer;
+@property (nonatomic, strong) UIView *playerContainerView;
 @property (weak, nonatomic) IBOutlet UILabel *lblCreditsHd;
 @property (weak, nonatomic) IBOutlet UILabel *lblCreditsNonHd;
 
@@ -129,6 +130,20 @@
     
     [self.activityIndicator startAnimating];
     _lblBuffering.hidden = NO;
+    
+    // Register for app lifecycle notifications to keep audio playing in background
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appDidEnterBackground:)
+                                                 name:UIApplicationDidEnterBackgroundNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appWillEnterForeground:)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+}
+
+- (BOOL)isAVPlayerPlaying {
+    return avPlayer && avPlayer.rate > 0 && avPlayer.error == nil;
 }
 
 - (void)didReceiveMemoryWarning
@@ -169,8 +184,8 @@
 
 -(void)loadVideoData {
     [self showLoading];
-    [moviePlayerController stop];
-    [moviePlayerController.view removeFromSuperview];
+    [avPlayer pause];
+    [_playerContainerView removeFromSuperview];
     
     _isInitial = TRUE;
     _lblBuffering.hidden = NO;
@@ -288,7 +303,6 @@
     _vidTimer = [NSTimer timerWithTimeInterval:1 target:self selector:@selector(updatePlaybackProgressFromTimer:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:_vidTimer forMode:NSRunLoopCommonModes];
     
-    //[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(updatePlaybackProgressFromTimer:) userInfo:nil repeats:YES];
     NSURL *movieURL = [NSURL URLWithString:strVideoUrl];
     
     if (!movieURL) {
@@ -298,65 +312,56 @@
         return;
     }
     
-    NSLog(@"Creating movie player with URL: %@", movieURL);
+    NSLog(@"Creating AVPlayer with URL: %@", movieURL);
     
-    moviePlayerController = [[MPMoviePlayerController alloc] initWithContentURL:movieURL];
+    // Clean up previous player
+    if (avPlayer) {
+        [avPlayer pause];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:avPlayer.currentItem];
+        [avPlayer removeObserver:self forKeyPath:@"status"];
+    }
     
-    if (!moviePlayerController) {
-        NSLog(@"ERROR: Failed to create MPMoviePlayerController");
+    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:movieURL];
+    avPlayer = [AVPlayer playerWithPlayerItem:playerItem];
+    
+    if (!avPlayer) {
+        NSLog(@"ERROR: Failed to create AVPlayer");
         [UtilityModel showAlert:@"Video Error" msg:@"Failed to initialize video player."];
         [self hideLoading];
         return;
     }
     
-    [moviePlayerController prepareToPlay];
-    moviePlayerController.movieSourceType = MPMovieSourceTypeStreaming;
+    NSLog(@"AVPlayer created successfully.");
     
-    NSLog(@"Movie player created successfully. Source type: Streaming");
+    // Observe player status to know when it's ready to play
+    [avPlayer addObserver:self forKeyPath:@"status" options:NSKeyValueObservingOptionNew context:nil];
     
+    // Observe when playback finishes
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(moviePlaybackComplete:)
-                                                 name:MPMoviePlayerPlaybackDidFinishNotification
-                                               object:moviePlayerController];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(moviePlayerPlaybackStateDidChange:)
-                                                 name:MPMoviePlayerPlaybackStateDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(moviePlayerLoadStateDidChange:)
-                                                 name:MPMoviePlayerLoadStateDidChangeNotification object:nil];
+                                                 name:AVPlayerItemDidPlayToEndTimeNotification
+                                               object:playerItem];
     
-    
-    moviePlayerController.view.backgroundColor = [UIColor clearColor];
-    // Position at top (y=0) to eliminate white space above video
+    // Set up the player layer in a container view
     CGFloat videoWidth = self.view.bounds.size.width;
     CGFloat videoHeight = videoWidth * (9.0/16.0);
     
-    NSLog(@"🎬 Setting movie player frame - width: %.1f, height: %.1f", videoWidth, videoHeight);
-    NSLog(@"🎬 btnPreview frame before video: %@", NSStringFromCGRect(_btnPreview.frame));
+    NSLog(@"Setting AVPlayer frame - width: %.1f, height: %.1f", videoWidth, videoHeight);
     
-    [moviePlayerController.view setFrame:CGRectMake(0,
-                                                    0,
-                                                    videoWidth,
-                                                    videoHeight)];
-    moviePlayerController.controlStyle = MPMovieControlStyleNone;
+    // Remove previous container if any
+    [_playerContainerView removeFromSuperview];
     
-    NSLog(@"🎬 Movie player frame set to: %@", NSStringFromCGRect(moviePlayerController.view.frame));
+    _playerContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, videoWidth, videoHeight)];
+    _playerContainerView.backgroundColor = [UIColor clearColor];
     
-    // Disable VisionKit interactions that may trigger background removal warnings
-    if (@available(iOS 16.0, *)) {
-        for (UIGestureRecognizer *recognizer in moviePlayerController.view.gestureRecognizers) {
-            if ([NSStringFromClass([recognizer class]) containsString:@"ImageAnalysis"]) {
-                recognizer.enabled = NO;
-            }
-        }
-    }
+    avPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:avPlayer];
+    avPlayerLayer.frame = _playerContainerView.bounds;
+    avPlayerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+    [_playerContainerView.layer addSublayer:avPlayerLayer];
     
-    [self.view addSubview:moviePlayerController.view];
-    moviePlayerController.initialPlaybackTime = 1;
+    [self.view addSubview:_playerContainerView];
     
-    // Don't call pause immediately - let it load first
-    // The player will be in a paused state initially anyway
-    NSLog(@"Movie player view added to hierarchy");
+    NSLog(@"AVPlayer view added to hierarchy");
     
     //seek bar
     _shadowSlider = [[UIView alloc] init];
@@ -402,150 +407,120 @@
     [task resume];
 }
 
+#pragma mark - Background Playback -
+
+- (void)appDidEnterBackground:(NSNotification *)notification {
+    // Detach the player layer so AVPlayer continues audio-only in the background.
+    // AVPlayer natively supports background audio when the audio session category
+    // is set to Playback and UIBackgroundModes includes "audio".
+    if ([self isAVPlayerPlaying]) {
+        avPlayerLayer.player = nil;
+    }
+}
+
+- (void)appWillEnterForeground:(NSNotification *)notification {
+    // Reattach the player layer so video renders again
+    if (avPlayer) {
+        avPlayerLayer.player = avPlayer;
+    }
+    
+    // Update UI to reflect current playback state
+    if ([self isAVPlayerPlaying]) {
+        UIImage *btnImage = [UIImage imageNamed:@"icon_pause"];
+        [_btnPlay setImage:btnImage forState:UIControlStateNormal];
+        _lblSecondsLeft.text = [NSString stringWithFormat:@"%ld",(long)self.seconds];
+    } else {
+        UIImage *btnImage = [UIImage imageNamed:@"icon_play"];
+        [_btnPlay setImage:btnImage forState:UIControlStateNormal];
+    }
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    @try {
+        [avPlayer removeObserver:self forKeyPath:@"status"];
+    } @catch (NSException *exception) {
+        // Observer was already removed
+    }
+}
+
 #pragma mark - SKSlideViewDelegate -
 
-#pragma mark - MoviePlayer -
+#pragma mark - AVPlayer KVO & Notifications -
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    if (object == avPlayer && [keyPath isEqualToString:@"status"]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (avPlayer.status == AVPlayerStatusReadyToPlay) {
+                NSLog(@"AVPlayer ready to play");
+                if (_isInitial) {
+                    [avPlayer seekToTime:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC)];
+                    [avPlayer play];
+                    _isInitial = FALSE;
+                    [self hideLoading];
+                }
+            } else if (avPlayer.status == AVPlayerStatusFailed) {
+                NSLog(@"AVPlayer failed: %@", avPlayer.error.localizedDescription);
+                [UtilityModel showAlert:@"Video Error" msg:avPlayer.error.localizedDescription ?: @"Failed to load video."];
+                [self hideLoading];
+            }
+        });
+    }
+}
 
 - (void)moviePlaybackComplete:(NSNotification *)notification {
-    moviePlayerController = [notification object];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:MPMoviePlayerPlaybackDidFinishNotification
-                                                  object:moviePlayerController];
-    [moviePlayerController stop];
-    // to prevent flickering on second play
-    moviePlayerController.initialPlaybackTime = -1;
-    [moviePlayerController.view removeFromSuperview];
-    MPMovieFinishReason finishReason = [notification.userInfo[MPMoviePlayerPlaybackDidFinishReasonUserInfoKey] integerValue];
-    NSError *error = notification.userInfo[@"error"];
-    NSString *reason = @"Unknown";
-    switch (finishReason)
-    {
-        case MPMovieFinishReasonPlaybackEnded:
-            reason = @"Playback Ended";
-            break;
-        case MPMovieFinishReasonPlaybackError:
-            reason = @"Playback Error";
-            if (error) {
-                NSLog(@"Playback Error: %@", [error localizedDescription]);
-                NSLog(@"Error details: %@", error);
-            }
-            break;
-        case MPMovieFinishReasonUserExited:
-            reason = @"User Exited";
-            break;
-    }
-    NSLog(@"Finish Reason: %@%@", reason, error ? [@"\n" stringByAppendingString:[error description]] : @"");
-}
-
-- (void) moviePlayerPlaybackStateDidChange:(NSNotification *)notification
-{
-    moviePlayerController = notification.object;
-    NSString *playbackState = @"Unknown";
-    switch (moviePlayerController.playbackState)
-    {
-        case MPMoviePlaybackStateStopped:
-            playbackState = @"Stopped";
-            [_btnPlay setImage:[UIImage imageNamed:@"icon_play"] forState:UIControlStateNormal];
-            break;
-        case MPMoviePlaybackStatePlaying:
-            playbackState = @"Playing";
-            [self hideLoading];
-            break;
-        case MPMoviePlaybackStatePaused:
-            playbackState = @"Paused";
-            [self hideLoading];
-            break;
-        case MPMoviePlaybackStateInterrupted:
-            playbackState = @"Interrupted";
-            [self showLoading];
-            [_btnPlay setImage:[UIImage imageNamed:@"icon_play"] forState:UIControlStateNormal];
-            break;
-        case MPMoviePlaybackStateSeekingForward:
-            playbackState = @"Seeking Forward";
-            [self showLoading];
-            break;
-        case MPMoviePlaybackStateSeekingBackward:
-            playbackState = @"Seeking Backward";
-            [self showLoading];
-            break;
-    }
-    NSLog(@"Playback State: %@", playbackState);
-}
-
-- (void) moviePlayerLoadStateDidChange:(NSNotification *)notification
-{
-    moviePlayerController = notification.object;
-    NSMutableString *loadState = [NSMutableString new];
-    MPMovieLoadState state = moviePlayerController.loadState;
+    NSLog(@"Playback finished");
+    [avPlayer pause];
+    [_playerContainerView removeFromSuperview];
     
-    NSLog(@"Load State Raw Value: %lu", (unsigned long)state);
-    
-    if (state & MPMovieLoadStatePlayable) {
-        [loadState appendString:@" | Playable"];
-        
-        // Once playable, we can start playing if this is initial load
-        if (_isInitial && moviePlayerController.playbackState != MPMoviePlaybackStatePlaying) {
-            NSLog(@"Video is playable - starting playback from second 1");
-            moviePlayerController.currentPlaybackTime = 1.0;
-            [moviePlayerController play];
-            _isInitial = FALSE;  // Mark as no longer initial
-        }
-    }
-    if (state & MPMovieLoadStatePlaythroughOK) {
-        [loadState appendString:@" | Playthrough OK"];
-        [self hideLoading];  // Hide loading when playthrough is ready
-    }
-    if (state & MPMovieLoadStateStalled) {
-        [loadState appendString:@" | Stalled"];
-        [self showLoading];
-    }
-    if (state == MPMovieLoadStateUnknown) {
-        [loadState appendString:@" | Unknown"];
-    }
-    
-    NSLog(@"Load State: %@", loadState.length > 0 ? [loadState substringFromIndex:3] : @"N/A");
-    NSLog(@"Duration: %f, Current Time: %f", moviePlayerController.duration, moviePlayerController.currentPlaybackTime);
+    UIImage *btnImage = [UIImage imageNamed:@"icon_play"];
+    [_btnPlay setImage:btnImage forState:UIControlStateNormal];
 }
 
 - (void)updatePlaybackProgressFromTimer:(NSTimer *)timer {
-    NSTimeInterval duration = moviePlayerController.duration;
-    NSTimeInterval currentTime = moviePlayerController.currentPlaybackTime;
+    if (!avPlayer || !avPlayer.currentItem) return;
+    
+    NSTimeInterval duration = CMTimeGetSeconds(avPlayer.currentItem.duration);
+    NSTimeInterval currentTime = CMTimeGetSeconds(avPlayer.currentTime);
     
     // Only update slider if we have valid duration and time values
     if (!isnan(duration) && duration > 0 && !isnan(currentTime)) {
-        _seekbar.maximumValue = duration;
-        _seekbar.value = currentTime;
-        float smartWidth = 0.0;
-        smartWidth = (210 * duration) / 100;
-        _shadowSlider.frame = CGRectMake( _shadowSlider.frame.origin.x , _shadowSlider.frame.origin.y , smartWidth , _shadowSlider.frame.size.height);
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+            _seekbar.maximumValue = duration;
+            _seekbar.value = currentTime;
+            float smartWidth = 0.0;
+            smartWidth = (210 * duration) / 100;
+            _shadowSlider.frame = CGRectMake( _shadowSlider.frame.origin.x , _shadowSlider.frame.origin.y , smartWidth , _shadowSlider.frame.size.height);
+        }
     }
     
-    if (([UIApplication sharedApplication].applicationState == UIApplicationStateActive) && (moviePlayerController.playbackState == MPMoviePlaybackStatePlaying)) {
-        
-        UIImage *btnImage = [UIImage imageNamed:@"icon_pause"];
-        [_btnPlay setImage:btnImage forState:UIControlStateNormal];
+    if ([self isAVPlayerPlaying]) {
         
         self.seconds -= 1;
         
-        _lblSecondsLeft.text = [NSString stringWithFormat:@"%ld",(long)self.seconds];
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+            UIImage *btnImage = [UIImage imageNamed:@"icon_pause"];
+            [_btnPlay setImage:btnImage forState:UIControlStateNormal];
+            _lblSecondsLeft.text = [NSString stringWithFormat:@"%ld",(long)self.seconds];
+        }
         
         if (self.seconds<1) {
-            [moviePlayerController stop];
-            // to prevent flickering on second play
-            moviePlayerController.initialPlaybackTime = -1;
-            [moviePlayerController.view removeFromSuperview];
+            [avPlayer pause];
             
-            UIImage *btnImage = [UIImage imageNamed:@"icon_play"];
-            [_btnPlay setImage:btnImage forState:UIControlStateNormal];
-            _lblSecondsLeft.text = @"0";
+            if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                [_playerContainerView removeFromSuperview];
+                UIImage *btnImage = [UIImage imageNamed:@"icon_play"];
+                [_btnPlay setImage:btnImage forState:UIControlStateNormal];
+                _lblSecondsLeft.text = @"0";
+            }
         }
     }
 }
 
 -(IBAction)sliderValueChanged:(UISlider *)sender
 {
-    moviePlayerController.currentPlaybackTime = sender.value;
-    NSLog(@"time: %f", moviePlayerController.currentPlaybackTime);
+    CMTime seekTime = CMTimeMakeWithSeconds(sender.value, NSEC_PER_SEC);
+    [avPlayer seekToTime:seekTime];
     NSLog(@"seek: %f", sender.value);
     NSLog(@"max: %f", sender.maximumValue);
 }
@@ -612,18 +587,17 @@
 }
 
 - (IBAction)togglePlay:(id)sender {
-    if (([UIApplication sharedApplication].applicationState == UIApplicationStateActive) && (moviePlayerController.playbackState == MPMoviePlaybackStatePlaying)) {
+    if ([self isAVPlayerPlaying]) {
         UIImage *btnImage = [UIImage imageNamed:@"icon_play"];
         [sender setImage:btnImage forState:UIControlStateNormal];
-        [moviePlayerController pause];
+        [avPlayer pause];
     } else {
-        moviePlayerController.controlStyle = MPMovieControlStyleNone;
         if (_isInitial) {
-            moviePlayerController.currentPlaybackTime = 1;
+            [avPlayer seekToTime:CMTimeMakeWithSeconds(1.0, NSEC_PER_SEC)];
         }
         UIImage *btnImage = [UIImage imageNamed:@"icon_pause"];
         [sender setImage:btnImage forState:UIControlStateNormal];
-        [moviePlayerController play];
+        [avPlayer play];
     }
     _isInitial = FALSE;
 }

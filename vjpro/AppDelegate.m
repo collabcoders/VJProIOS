@@ -8,12 +8,24 @@
 
 #import "AppDelegate.h"
 #import "LaunchViewController.h"
+#import <AVFoundation/AVFoundation.h>
 
 @implementation AppDelegate
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // Configure audio session for background playback
+    NSError *audioError = nil;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&audioError];
+    if (audioError) {
+        NSLog(@"Audio session category error: %@", audioError);
+    }
+    [[AVAudioSession sharedInstance] setActive:YES error:&audioError];
+    if (audioError) {
+        NSLog(@"Audio session activation error: %@", audioError);
+    }
+    
     // Add custom launch screen overlay FIRST (before anything else)
     LaunchViewController *launchVC = [[LaunchViewController alloc] init];
     [self.window addSubview:launchVC.view];

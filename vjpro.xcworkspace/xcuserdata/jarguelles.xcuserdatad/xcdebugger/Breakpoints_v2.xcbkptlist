@@ -14,9 +14,9 @@
             filePath = "vjpro/PreviewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "376"
-            endingLineNumber = "376"
-            landmarkName = "-setSKSlideViewControllerReference:"
+            startingLineNumber = "370"
+            endingLineNumber = "370"
+            landmarkName = "-loadVideoData"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

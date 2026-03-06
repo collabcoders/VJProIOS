@@ -8,12 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "SKSlideViewController.h"
-#import <MediaPlayer/MediaPlayer.h>
+#import <AVFoundation/AVFoundation.h>
 #import "VideoModel.h"
 #import "VideoCellModel.h"
 
 @interface PreviewController : UIViewController<SKSlideViewDelegate> {
-    MPMoviePlayerController *moviePlayerController;
+    AVPlayer *avPlayer;
+    AVPlayerLayer *avPlayerLayer;
 }
 @property (nonatomic) NSInteger seconds;
 @property (nonatomic, assign) VideoCellModel * cellSelected;
